@@ -13,10 +13,10 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid" >
         <div class="row">
             <div class="col" align="right">
-                <button type="button" class="btn btn-success">添 加</button>
+                <button type="button" class="btn btn-success" onclick="onNew()">添 加</button>
                 <button type="button" class="btn btn-success">删 除</button>
             </div>
         </div>
@@ -65,6 +65,12 @@
     <script src="../lib/jquery/jquery.3.2.1.js"></script>
     <script src="../lib/popper/popper.1.12.9.js"></script>
     <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+
+    <script>
+        function onNew(){
+            window.location = "SupplierDetail.html";
+        }
+    </script>
 </body>
 
 </html>

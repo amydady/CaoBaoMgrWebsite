@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+  <title>Simple</title>
+</head>
+
+<body>
+  <div class="container-fluid" ng-app="myApp" ng-controller="myCtrl">
+    <input type='text' ng-model="carname" size="80" />
+    {{carname}}
+  </div>
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+
+  <script>
+
+
+
+
+    var app = angular.module('myApp', []);
+
+    app.controller('myCtrl', function ($scope) {
+      $scope.carname = "Volvo";
+    });
+
+
+    // $http({
+    //   method: "GET",
+    //   url: "http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=-1",
+    //   headers: {
+    //     "Content-Type": "application/json", // your config”
+
+    //   },
+    //   data: ""//data
+    // }).then(function (response) {
+    //   $scope.status = response.status;
+    //   $scope.data = response.data;
+    // }, function (response) {
+    //   $scope.data = response.data || 'Request failed';
+    //   $scope.status = response.status;
+    // });
+
+  </script>
+</body>
+
+</html>
