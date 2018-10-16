@@ -12,12 +12,16 @@
   <title>Simple</title>
 </head>
 
-<body>
-  <div class="container-fluid" ng-app="myApp" ng-controller="myCtrl">
+<body ng-app="myApp" ng-controller="myCtrl">
+  <div class="container-fluid">
     <input type='text' ng-model="carname" size="80" />
     {{carname}}
+    <ul>
+      <li ng-repeat="x in names">
+        {{ x.name + ', ' + x.country }}
+      </li>
+    </ul>
   </div>
-
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -29,26 +33,35 @@
   <script>
     var app = angular.module('myApp', []);
 
-    app.controller('myCtrl', function ($scope) {
+    app.controller('myCtrl', function ($scope, $http) {
       $scope.carname = "Volvo";
+      $scope.names = [
+        { name: 'Jani', country: 'Norway' },
+        { name: 'Hege', country: 'Sweden' },
+        { name: 'Kai', country: 'Denmark' }
+      ];
+      $scope.f = function () {
+        $scope.carname = "init";
+      };
+      $http.get('http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=-1',
+        {
+          params: {
+            // name: '张三',
+            // age: 'abc'
+          },
+          Headers:{
+            content-type:'application/json'
+          }
+        }).then(function (result) {  //正确请求成功时处理
+          console.log(result);
+        }).catch(function (result) { //捕捉错误处理
+          console.log(result);
+          alert(result.data.Message);
+        });
     });
 
 
-    // $http({
-    //   method: "GET",
-    //   url: "http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=-1",
-    //   headers: {
-    //     "Content-Type": "application/json", // your config”
 
-    //   },
-    //   data: ""//data
-    // }).then(function (response) {
-    //   $scope.status = response.status;
-    //   $scope.data = response.data;
-    // }, function (response) {
-    //   $scope.data = response.data || 'Request failed';
-    //   $scope.status = response.status;
-    // });
 
   </script>
 </body>
