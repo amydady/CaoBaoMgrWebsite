@@ -6,7 +6,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
@@ -51,54 +50,42 @@
   <script>
     var app = angular.module('myApp', []);
 
-    app.config(['$locationProvider', function ($locationProvider) {
-      $locationProvider.html5Mode(
-        {
-          enabled: true,
-          requireBase: false//必须配置为false，否则<base href=''>这种格式带base链接的地址才能解析
-        });
-    }]);
-
-    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+    app.controller('myCtrl', function ($scope, $http) {
       // $scope.name='aaa';
       // $scope.remark='123';
-      $scope.supplierInfo = {
-        id: $location.search().id
-      }
-
       $scope.saveData = function () {
         if ($scope.supplierInfo.id) {//修改
-          alert($scope.supplierInfo.id)
+          alert($scope.supplierInfo.name)
         }
         else {//新增
           var config = {
-            headers: { 'Content-Type': 'application/json' }
-            // transformRequest: function (obj) {
-            //     var str = [];
-            //     for (var p in obj) {
-            //         str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-            //     }
-            //     return str.join("&");
-            // }
-          };
+                    headers: { 'Content-Type': 'application/json' }
+                    // transformRequest: function (obj) {
+                    //     var str = [];
+                    //     for (var p in obj) {
+                    //         str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                    //     }
+                    //     return str.join("&");
+                    // }
+                };
 
-          var data = {
-            "name": $scope.supplierInfo.name,
-            "remark": $scope.supplierInfo.remark
-          }
+                var data = {
+                    "name":$scope.supplierInfo.name,
+                    "remark":$scope.supplierInfo.remark
+                }
 
-          $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, config)
-            .then(function (result) {  //正确请求成功时处理
-              window.location = 'SupplierList.html'
-            }).catch(function (result) { //捕捉错误处理
-              console.log(result);
-            });
+                $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, config)
+                    .then(function (result) {  //正确请求成功时处理
+                        window.location = 'SupplierList.html'
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
         }
       }
 
-    }]);
+    });
 
-
+    
   </script>
 </body>
 
