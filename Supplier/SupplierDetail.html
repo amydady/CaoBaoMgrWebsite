@@ -15,6 +15,17 @@
 
 <body ng-app="myApp" ng-controller="myCtrl">
   <div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-2">
+        <h4>供应商详情</h4>
+      </div>
+
+      <div class="col-10" id='alertInfo'>
+        
+      </div>
+    </div>
+
     <form>
       <div class="form-group row">
         <label for="inputName" class="col-sm-1 col-form-label">名称</label>
@@ -51,7 +62,6 @@
       </div>
 
     </form>
-
   </div>
 
 
@@ -66,13 +76,7 @@
   <script>
     var app = angular.module('myApp', []);
 
-    app.config(['$locationProvider', function ($locationProvider) {
-      $locationProvider.html5Mode(
-        {
-          enabled: true,
-          requireBase: false//必须配置为false，否则<base href=''>这种格式带base链接的地址才能解析
-        });
-    }]);
+    CommonConfig.configApp(app);
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
       $scope.supplierInfo = {
@@ -114,7 +118,7 @@
             "remark": $scope.supplierInfo.remark
           }
 
-          $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, commonConfig.httpReqConfig)
+          $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
               window.location = 'SupplierList.html'
             }).catch(function (result) { //捕捉错误处理
@@ -129,10 +133,13 @@
             "enable": $scope.supplierInfo.enable
           }
 
-          $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, commonConfig.httpReqConfig)
+          $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
+              AlertUtil.successWithCloseButton('alertInfo','修改成功！');
+
               console.log(result);
             }).catch(function (result) { //捕捉错误处理
+              AlertUtil.dangerWithCloseButton('alertInfo','修改失败！');
               console.log(result);
             });
         }
