@@ -92,10 +92,10 @@
             $scope.supplierInfo.enable = result.data.data[0].enable;
             $scope.supplierInfo.enableV = $scope.supplierInfo.enable == 'Y' ? '是' : '否';
 
-            DebugUtil.log(result);
+            console.log(result);
 
           }).catch(function (result) { //捕捉错误处理
-            DebugUtil.log(result);
+            console.log(result);
           });
 
         $scope.saveBtnTitle = '修 改';
@@ -106,7 +106,7 @@
 
 
       $scope.saveData = function () {
-        DebugUtil.log($scope.supplierInfo.id);
+        console.log($scope.supplierInfo.id);
 
         if ($scope.isAdd) {//新增
           var data = {
@@ -118,7 +118,7 @@
             .then(function (result) {  //正确请求成功时处理
               window.location = 'SupplierList.html'
             }).catch(function (result) { //捕捉错误处理
-              DebugUtil.log(result);
+              console.log(result);
             });
         }
         else {//修改
@@ -131,9 +131,9 @@
 
           $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, commonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              DebugUtil.log(result);
+              console.log(result);
             }).catch(function (result) { //捕捉错误处理
-              DebugUtil.log(result);
+              console.log(result);
             });
         }
       };

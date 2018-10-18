@@ -11,5 +11,5 @@ var commonConfig = {
 };
 
 
-var debugFlag = false
+var debugFlag = true
 
