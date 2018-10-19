@@ -10,9 +10,19 @@
   <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
   <title>CaoBaoServiceMain</title>
+
+  <style>
+    .navbar{
+      font-size:x-large;
+    }
+    .card-header{
+      font-size:larger;
+    }
+
+  </style>
 </head>
 
-<body>
+<body ng-app="myApp" ng-controller="myCtrl">
   <div class="container-fluid">
     <!-- header -->
     <div class="row">
@@ -20,53 +30,14 @@
       <div class="col">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <a class="navbar-brand" href="#">LOGO预留</a>
-          <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button> -->
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
-                  Dropdown
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
+              <li class="nav-item" ng-repeat="x in navMenuData">
+                <a class="nav-link" ng-click='loadLeftMenu(x.id,x.name)' href='#'>{{x.name}}</a>
               </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
           </div>
-        </nav>
-      </div>
-    </div>
-
-    <div class="row">
-      <!-- 面包屑 -->
-      <div class="col">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Library</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Data</li>
-          </ol>
         </nav>
       </div>
     </div>
@@ -79,53 +50,24 @@
           <div class="card">
             <div class="card-header">
               <a class="card-link" data-toggle="collapse" href="#collapseOne">
-                选项一
+                {{leftMenuData.pname}}
               </a>
             </div>
             <div id="collapseOne" class="collapse show" data-parent="#accordion">
-              <div class="card-body">
-                #1 子菜单一
+              <div class="card-body" ng-repeat="x in leftMenuData.menuData">
+                <a class="card-link" href="{{x.targetUrl}}" target='if_content'>{{x.name}}</a>
               </div>
+
             </div>
           </div>
-          <div class="card">
-            <div class="card-header">
-              <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
-                选项二
-              </a>
-            </div>
-            <div id="collapseTwo" class="collapse" data-parent="#accordion">
-              <div class="card-body">
-                #2 子菜单二
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header">
-              <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
-                选项三
-              </a>
-            </div>
-            <div id="collapseThree" class="collapse" data-parent="#accordion">
-              <div class="card-body">
-                #3 子菜单三
-              </div>
-            </div>
-          </div>
-          <div class="card">
-              <div class="card-header">
-                <a class="card-link"  href="https://www.baidu.com" target="if_content">
-                  直接可以点击
-                </a>
-              </div>
-            </div>
         </div>
       </div>
 
       <!-- content -->
       <div class="col-10">
         <div>
-          <iframe id="if_content" src="../Supplier/SupplierList.html" style="width:100%;height: 600px" frameborder='0' name="if_content"></iframe>
+          <iframe id="if_content" src="../Supplier/SupplierList.html" style="width:100%;height: 600px" frameborder='0'
+            name="if_content"></iframe>
         </div>
       </div>
 
@@ -144,9 +86,74 @@
     <script src="../lib/jquery/jquery.3.2.1.js"></script>
     <script src="../lib/popper/popper.1.12.9.js"></script>
     <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/angular-1.7.5/angular.min.js"></script>
+    <script src="../common/littleCatCommon.js"></script>
 
     <script>
-      
+      var app = angular.module('myApp', []);
+
+      CommonConfig.configApp(app);
+
+      app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+
+        //获取进入页面时的MenuID
+        $scope.menuId = $location.search().menuId;
+        $scope.menuName = $location.search().menuName;
+
+        console.log('$scope.menuId', $scope.menuId);
+        console.log('$scope.menuName', $scope.menuName);
+
+        //加载顶级导航菜单
+        $scope.loadNavMenu = function () {
+          $http.get('http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=-1')
+            .then(function (result) {  //正确请求成功时处理
+              $scope.navMenuData = result.data.data;
+
+              for (var i = 0; i < $scope.navMenuData.length; i++) {
+                if ($scope.navMenuData[i].isDefault == 'Y') {
+                  $scope.menuId = $scope.navMenuData[i].id;
+                  $scope.menuName = $scope.navMenuData[i].name;
+                }
+              }
+
+              console.log(' $scope.navMenuData:', $scope.navMenuData);
+
+            }).catch(function (result) { //捕捉错误处理
+              console.log(result);
+            });
+        };
+
+        //通过PID加载左侧菜单
+        $scope.loadLeftMenu = function (pid, pname) {
+          $scope.leftMenuData = {
+            pname: pname
+          };
+
+          $http.get('http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=' + pid)
+            .then(function (result) {  //正确请求成功时处理
+              $scope.leftMenuData.menuData = result.data.data;
+
+              //加载默认页面
+              for (var i = 0; i < $scope.leftMenuData.menuData.length; i++) {
+                if ($scope.leftMenuData.menuData[i].isDefault == 'Y') {
+                  document.getElementById('if_content').src = $scope.leftMenuData.menuData[i].targetUrl;
+                  console.log('if_content.src:', document.getElementById('if_content').src);
+                }
+              }
+
+              console.log(' $scope.leftMenuData:success:', $scope.leftMenuData);
+            }).catch(function (result) { //捕捉错误处理
+              console.log('$scope.loadLeftMenu:error:', result);
+            });
+        };
+
+        $scope.loadNavMenu();
+
+        //加载默认左侧菜单
+        $scope.loadLeftMenu($scope.menuId, $scope.menuName);
+
+      }]);
+
     </script>
 </body>
 
