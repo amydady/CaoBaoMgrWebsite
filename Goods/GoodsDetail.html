@@ -6,24 +6,185 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
-  <title>GoodsDetail</title>
+  <title>GodosDetail</title>
 </head>
 
-<body>
+<body ng-app="myApp" ng-controller="myCtrl">
   <div class="container-fluid">
-    
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-2">
+        <h4>商品详情</h4>
+      </div>
 
+      <div class="col-10" id='alertInfo'>
+
+      </div>
     </div>
 
+    <form>
+      <div class="form-group row">
+        <label for="inputName" class="col-sm-1 col-form-label">名称</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputName" placeholder="名称" ng-model="info.name">
+        </div>
+        <label for="inputRemark" class="col-sm-1 col-form-label">概要信息</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputRemark" placeholder="概要信息" ng-model="info.summaryDescription">
+        </div>
+      </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="../lib/jquery/jquery.3.2.1.js"></script>
-    <script src="../lib/popper/popper.1.12.9.js"></script>
-    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+      <div class="form-group row">
+        <label for="selectDeliveryArea" class="col-sm-1 col-form-label">发货区域</label>
+        <div class="col-sm-5">
+          <select class="form-control">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+        </div>
+        <label for="selectDeliveryFeeRule" class="col-sm-1 col-form-label">物流费用规则</label>
+        <div class="col-sm-5">
+          <input type="select" class="form-control" id="selectDeliveryFeeRule" ng-model="info.deliveryFeeRuleId">
+        </div>
+      </div>
+
+      <div class="form-group row" ng-hide="isAdd">
+        <label for="inputEnable" class="col-sm-1 col-form-label">创建人</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="info.createOperatorV">
+        </div>
+
+        <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="info.createTime">
+        </div>
+
+      </div>
+
+      <div class="form-group row" ng-hide="isAdd">
+        <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="info.createTime">
+        </div>
+        <label for="inputEnable" class="col-sm-1 col-form-label">是否有效</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="info.enableV">
+        </div>
+      </div>
+
+
+      <div class="form-group row">
+        <div class="col-sm-11">
+          <button type="submit" class="btn btn-primary" ng-click="saveData()">{{saveBtnTitle}}</button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- 产品主图上传 -->
+    <form>
+      <div class="form-group row">
+        <label for="inputName" class="col-sm-1 col-form-label">产品主图上传</label>
+        <div class="col-sm-5">
+          <input type="file" class="form-control" id="fileMainImg">
+        </div>
+        <button type="submit" class="btn btn-primary" ng-click="saveMainImg()">确 定</button>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
+
+  <script>
+    var app = angular.module('myApp', []);
+
+    CommonConfig.configApp(app);
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+      $scope.supplierInfo = {
+        id: $location.search().id
+      };
+
+      if (StringUtil.isNotEmpty($scope.supplierInfo.id)) {
+        //是否为新增
+        $scope.isAdd = false;
+
+        $http.get('http://localhost:8006/rest/littlecat/caobao/supplier/getbyid?id=' + $scope.supplierInfo.id)
+          .then(function (result) {  //正确请求成功时处理
+
+            $scope.supplierInfo.name = result.data.data[0].name;
+            $scope.supplierInfo.remark = result.data.data[0].remark;
+            $scope.supplierInfo.createTime = result.data.data[0].createTime;
+            $scope.supplierInfo.enable = result.data.data[0].enable;
+            $scope.supplierInfo.enableV = $scope.supplierInfo.enable == 'Y' ? '是' : '否';
+
+            console.log(result);
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+
+        $scope.saveBtnTitle = '修 改';
+      } else {
+        $scope.isAdd = true;
+        $scope.saveBtnTitle = '添 加';
+      }
+
+
+      $scope.saveData = function () {
+        console.log($scope.supplierInfo.id);
+
+        if ($scope.isAdd) {//新增
+          var data = {
+            "name": $scope.supplierInfo.name,
+            "remark": $scope.supplierInfo.remark
+          }
+
+          $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              window.location = 'SupplierList.html'
+            }).catch(function (result) { //捕捉错误处理
+              console.log(result);
+            });
+        }
+        else {//修改
+          var data = {
+            "id": $scope.supplierInfo.id,
+            "name": $scope.supplierInfo.name,
+            "remark": $scope.supplierInfo.remark,
+            "enable": $scope.supplierInfo.enable
+          }
+
+          $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              AlertUtil.successWithCloseButton('alertInfo', '修改成功！');
+
+              console.log(result);
+            }).catch(function (result) { //捕捉错误处理
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！');
+              console.log(result);
+            });
+        }
+      };
+
+    }]);
+
+
+  </script>
 </body>
 
 </html>

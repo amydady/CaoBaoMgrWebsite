@@ -12,9 +12,58 @@
     <title>GoodsList</title>
 </head>
 
-<body>
+<body ng-app="myApp" ng-controller="myCtrl">
     <div class="container-fluid">
+        <!-- 页面标题 -->
+        <div class="row" style="height:60px">
+            <div class="col">
+                <h4>商品列表</h4>
+            </div>
+            <div class="col-10" id='alertInfo'>
 
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="row">
+            <div class="col" align="right">
+                <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
+                <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
+                <button type="button" class="btn btn-success" ng-click='onDisable()'>失 效</button>
+            </div>
+        </div>
+
+        <!-- 数据区域 -->
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover" id="table">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+                            <th scope="col">序 号</th>
+                            <th scope="col" ng-hide={{true}}>ID</th>
+                            <th scope="col">名 称</th>
+                            <th scope="col">概要信息</th>
+                            <th scope="col">价 格</th>
+                            <th scope="col">创建时间</th>
+                            <th scope="col">是否有效</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in listData">
+                            <td><input type="checkbox"></td>
+                            <td>{{ $index + 1 }}</td>
+                            <td ng-hide={{true}}>{{x.id}}</td>
+                            <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
+                            <td>{{x.summaryDescription}}</td>
+                            <td>￥{{x.price}}</td>
+                            <td>{{x.createTime}}</td>
+                            <td>{{x.enable=='Y'?'是':'否'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
@@ -24,6 +73,106 @@
     <script src="../lib/jquery/jquery.3.2.1.js"></script>
     <script src="../lib/popper/popper.1.12.9.js"></script>
     <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/angular-1.7.5/angular.min.js"></script>
+    <script src="../common/littleCatCommon.js"></script>
+
+    <script>
+        var app = angular.module('myApp', []);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.getData = function () {
+                var data = {
+                    "condition": {
+                        "logicType": "and",
+                        "condItems": [
+                            {
+
+                            }
+                        ]
+                    },
+                    "pageParam": {
+                        "pageSize": 40,
+                        "pageIndex": 1
+                    },
+                    "sortFields": "createTime",
+                    "sortType": "asc"
+                };
+
+                $http.post('http://localhost:8006/rest/littlecat/caobao/goods/getList', data, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.listData = result.data.data
+
+                        console.log(result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                        alert(result.data.Message);
+                    });
+            };
+
+            $scope.onSelectAllOrCancel = function () {
+                TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.listData.length);
+                $scope.selectAll = !$scope.selectAll;
+            };
+
+            $scope.add = function () {
+                window.location = "GoodsDetail.html";
+            };
+
+            //重置记录的选择状态
+            $scope.resetSelectStatus = function () {
+                document.getElementById('cbxSelectAllOrCancel').checked = false;
+                $scope.selectAll = false;
+            }
+
+            //置失效
+            $scope.onDisable = function () {
+                $scope.resetSelectStatus();
+                AlertUtil.clearAlert('alertInfo');
+
+                var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.listData.length);
+
+                if (ids == null || ids.length == 0) {
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！');
+                    return;
+                }
+
+                $http.put('http://localhost:8006/rest/littlecat/caobao/goods/batchdisable', ids, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log(result);
+                        $scope.getData();
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+            //置生效
+            $scope.onEnable = function () {
+                $scope.resetSelectStatus();
+                AlertUtil.clearAlert('alertInfo');
+
+                var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.listData.length);
+
+                if (ids == null || ids.length == 0) {
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！');
+                    return;
+                }
+
+                $http.put('http://localhost:8006/rest/littlecat/caobao/goods/batchenable', ids, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log(result);
+                        $scope.getData();
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+            //页面初始化
+            $scope.selectAll = false;
+            $scope.getData();
+        });
+    </script>
+
 </body>
 
 </html>
