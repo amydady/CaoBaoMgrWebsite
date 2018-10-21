@@ -18,7 +18,9 @@ function validDataRegin(tableid, dataStartIndex, dataNum) {
 }
 
 //对外提供的接口
-var TableUtil = new Object();
+var TableUtil = {
+
+};
 
 TableUtil.selectAllOrCncel = function (tableid, tag, dataStartIndex, dataNum) {
     var table = document.getElementById(tableid);
