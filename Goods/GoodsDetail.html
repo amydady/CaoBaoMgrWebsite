@@ -30,40 +30,53 @@
       <div class="form-group row">
         <label for="inputName" class="col-sm-1 col-form-label">名称</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="inputName" placeholder="名称" ng-model="info.name">
+          <input type="text" class="form-control" id="inputName" placeholder="名称" ng-model="goodsDetailInfo.name">
         </div>
         <label for="inputRemark" class="col-sm-1 col-form-label">概要信息</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="inputRemark" placeholder="概要信息" ng-model="info.summaryDescription">
+          <input type="text" class="form-control" id="inputRemark" placeholder="概要信息" ng-model="goodsDetailInfo.summaryDescription">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="selectSupplier" class="col-sm-1 col-form-label">供应商</label>
+        <div class="col-sm-5">
+          <select class="form-control" ng-model="goodsDetailInfo.supplierId">
+            <option value="-1" ng-selected>请选择...</option>
+            <option ng-repeat="x in supplierListData" value="{{x.id}}">{{x.name}}</option>
+          </select>
+        </div>
+        <label for="inputPrice" class="col-sm-1 col-form-label">价格</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputPrice" placeholder="价格（单位为厘）" ng-model="goodsDetailInfo.price">
         </div>
       </div>
 
       <div class="form-group row">
         <label for="selectDeliveryArea" class="col-sm-1 col-form-label">发货区域</label>
         <div class="col-sm-5">
-          <select class="form-control">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
+          <select class="form-control" ng-model="goodsDetailInfo.deliveryAreaId">
+            <option value="-1">请选择...</option>
+            <option ng-repeat="x in deliveryAreaListData" value="{{x.id}}">{{x.name}}</option>
           </select>
         </div>
         <label for="selectDeliveryFeeRule" class="col-sm-1 col-form-label">物流费用规则</label>
         <div class="col-sm-5">
-          <input type="select" class="form-control" id="selectDeliveryFeeRule" ng-model="info.deliveryFeeRuleId">
+          <select class="form-control" ng-model="goodsDetailInfo.deliveryFeeRuleId">
+            <option value="-1">请选择...</option>
+            <option ng-repeat="x in deliveryFeeRuleListData" value="{{x.id}}">{{x.name}}</option>
+          </select>
         </div>
       </div>
 
       <div class="form-group row" ng-hide="isAdd">
         <label for="inputEnable" class="col-sm-1 col-form-label">创建人</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="info.createOperatorV">
+          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.createOperatorV">
         </div>
 
         <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="info.createTime">
+          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="goodsDetailInfo.createTime">
         </div>
 
       </div>
@@ -71,11 +84,11 @@
       <div class="form-group row" ng-hide="isAdd">
         <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="info.createTime">
+          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="goodsDetailInfo.createTime">
         </div>
         <label for="inputEnable" class="col-sm-1 col-form-label">是否有效</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="info.enableV">
+          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.enableV">
         </div>
       </div>
 
@@ -115,24 +128,50 @@
     CommonConfig.configApp(app);
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
-      $scope.supplierInfo = {
+      $scope.goodsDetailInfo = {
         id: $location.search().id
       };
 
-      if (StringUtil.isNotEmpty($scope.supplierInfo.id)) {
+      $scope.getSupplierListData = function () {
+        var data = {
+          "condition": {
+            "logicType": "and",
+            "condItems": [
+              {
+                "fieldName": "enable",
+                "opType": "equal",
+                "value": "Y"
+              }
+            ]
+          },
+          "sortFields": "name",
+          "sortType": "asc"
+        };
+
+        $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/getList', data, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            $scope.supplierListData = result.data.data;
+
+            console.log(result);
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+            alert(result.data.Message);
+          });
+      };
+
+
+      if (StringUtil.isNotEmpty($scope.goodsDetailInfo.id)) {
         //是否为新增
         $scope.isAdd = false;
 
-        $http.get('http://localhost:8006/rest/littlecat/caobao/supplier/getbyid?id=' + $scope.supplierInfo.id)
+        $http.get('http://localhost:8006/rest/littlecat/caobao/goods/getbyid?id=' + $scope.goodsDetailInfo.id)
           .then(function (result) {  //正确请求成功时处理
 
-            $scope.supplierInfo.name = result.data.data[0].name;
-            $scope.supplierInfo.remark = result.data.data[0].remark;
-            $scope.supplierInfo.createTime = result.data.data[0].createTime;
-            $scope.supplierInfo.enable = result.data.data[0].enable;
-            $scope.supplierInfo.enableV = $scope.supplierInfo.enable == 'Y' ? '是' : '否';
+            $scope.goodsDetailInfo = result.data.data[0];
+            $scope.goodsDetailInfo.enableV = $scope.goodsDetailInfo.enable == 'Y' ? '是' : '否';
 
             console.log(result);
+            console.log('$scope.goodsDetailInfo:', $scope.goodsDetailInfo);
 
           }).catch(function (result) { //捕捉错误处理
             console.log(result);
@@ -146,30 +185,18 @@
 
 
       $scope.saveData = function () {
-        console.log($scope.supplierInfo.id);
 
         if ($scope.isAdd) {//新增
-          var data = {
-            "name": $scope.supplierInfo.name,
-            "remark": $scope.supplierInfo.remark
-          }
 
-          $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, CommonConfig.httpReqConfig)
+          $http.post('http://localhost:8006/rest/littlecat/caobao/goods/add', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              window.location = 'SupplierList.html'
+              window.location = 'GoodsList.html'
             }).catch(function (result) { //捕捉错误处理
               console.log(result);
             });
         }
         else {//修改
-          var data = {
-            "id": $scope.supplierInfo.id,
-            "name": $scope.supplierInfo.name,
-            "remark": $scope.supplierInfo.remark,
-            "enable": $scope.supplierInfo.enable
-          }
-
-          $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, CommonConfig.httpReqConfig)
+          $http.put('http://localhost:8006/rest/littlecat/caobao/goods/modify', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
               AlertUtil.successWithCloseButton('alertInfo', '修改成功！');
 
@@ -180,6 +207,8 @@
             });
         }
       };
+
+      $scope.getSupplierListData();
 
     }]);
 
