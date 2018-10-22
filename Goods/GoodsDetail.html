@@ -101,7 +101,7 @@
 
       <div class="form-group row">
         <div class="col-sm-11">
-          <button type="submit" class="btn btn-primary" ng-click="saveData()">{{saveBtnTitle}}</button>
+          <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
         </div>
       </div>
 
@@ -132,24 +132,24 @@
 
     <!-- 明细图片 -->
     <div ng-if="isAdd == false">
-      <br/>
+      <br />
       <div class="row">
         <div class="col-12">
           <h5>明细图片</h5>
         </div>
       </div>
       <div class="form-group row">
-          <label for="inputEnable" class="col-sm-1 col-form-label">标 题</label>
-          <div class="col-sm-5">
-            <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.detailImage.title">
-          </div>
-  
-          <label for="inputCreateTime" class="col-sm-1 col-form-label">排序编号</label>
-          <div class="col-sm-5">
-            <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="goodsDetailInfo.detailImage.sortNum">
-          </div>
-  
+        <label for="inputEnable" class="col-sm-1 col-form-label">标 题</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="detailImage.title">
         </div>
+
+        <label for="inputCreateTime" class="col-sm-1 col-form-label">排序编号</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="detailImage.sortNum">
+        </div>
+
+      </div>
 
       <form id="formdetailImg" method="POST" enctype="multipart/form-data">
         <div class="form-group row">
@@ -158,30 +158,33 @@
             <input type="file" class="form-control" id='goodsDetailImg' name='goodsDetailImg'>
           </div>
           <button type="submit" class="btn btn-primary" ng-click="saveGoodsDetailImg()">添 加</button>
+          <button class="btn btn-primary" ng-click="deleteGoodsDetailImg()">删 除</button>
         </div>
       </form>
 
       <div class="row">
-          <div class="col">
-              <table class="table table-striped table-hover" id="tableDetailImgs">
-                  <thead class="bg-primary text-white">
-                      <tr>
-                          <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                          <th scope="col">序 号</th>
-                          <th scope="col" ng-hide={{true}}>ID</th>
-                          <th scope="col">标 题</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr ng-repeat="x in goodsDetailInfo.detailImgs">
-                          <td><input type="checkbox"></td>
-                          <td>{{x.sortNum}}</td>
-                          <td ng-hide={{true}}>{{x.id}}</td>
-                          <td>{{x.title}}</td>
-                      </tr>
-                  </tbody>
-              </table>
-          </div>
+        <div class="col">
+          <table class="table table-striped table-hover" id="tableDetailImgs">
+            <thead class="bg-primary text-white">
+              <tr>
+                <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+                <th scope="col">序 号</th>
+                <th scope="col" ng-hide={{true}}>ID</th>
+                <th scope="col">标 题</th>
+                <th scope="col">预 览</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="x in goodsDetailInfo.detailImgs">
+                <td><input type="checkbox"></td>
+                <td>{{x.sortNum}}</td>
+                <td ng-hide={{true}}>{{x.id}}</td>
+                <td>{{x.title}}</td>
+                <td><img src="data:image/png;base64,{{x.imgData}}" alt="尚未上传产品图片" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -199,8 +202,8 @@
 
   <script>
     var app = angular.module('myApp', []);
-
     CommonConfig.configApp(app);
+
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
       $scope.goodsDetailInfo = {
@@ -237,12 +240,9 @@
           });
       };
 
-
-      if (StringUtil.isNotEmpty($scope.goodsDetailInfo.id)) {
-        //是否为新增
-        $scope.isAdd = false;
-
-        $http.get('http://localhost:8006/rest/littlecat/caobao/goods/getbyid?id=' + $scope.goodsDetailInfo.id)
+      // 根据产品ID获取产品明细信息
+      $scope.getGoodsDetailInfoById = function (id) {
+        $http.get('http://localhost:8006/rest/littlecat/caobao/goods/getbyid?id=' + id)
           .then(function (result) {  //正确请求成功时处理
 
             $scope.goodsDetailInfo = result.data.data[0];
@@ -254,16 +254,23 @@
           }).catch(function (result) { //捕捉错误处理
             console.log(result);
           });
+      };
 
-        $scope.saveBtnTitle = '修 改';
-      } else {
-        $scope.isAdd = true;
-        $scope.saveBtnTitle = '添 加';
-      }
+      // 初始化
+      $scope.init = function () {
+        $scope.getSupplierListData();
 
+        if (StringUtil.isNotEmpty($scope.goodsDetailInfo.id)) {
+          //是否为新增
+          $scope.isAdd = false;
+          $scope.getGoodsDetailInfoById($scope.goodsDetailInfo.id);
+        } else {
+          $scope.isAdd = true;
+        }
+      };
 
+      // 提交基本信息
       $scope.saveData = function () {
-
         if ($scope.isAdd) {//新增
 
           $http.post('http://localhost:8006/rest/littlecat/caobao/goods/add', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
@@ -294,13 +301,91 @@
         }
       };
 
+      //修改主图信息
       $scope.saveMainImg = function () {
         var formMainImg = document.getElementById("formMainImg");
-        formMainImg.action = 'http://localhost:8006/rest/littlecat/caobao/goods/uploadmainimg/' + $scope.goodsDetailInfo.id;
+        formMainImg.action = CommonConfig.RestBaseUrl + 'goods/uploadmainimg/' + $scope.goodsDetailInfo.id;
         formMainImg.submit();
       };
 
-      $scope.getSupplierListData();
+      //根据产品ID获取产品的明细图片信息
+      $scope.getGoodsDetailImg = function (goodsId) {
+        var queryData = {
+          "condition": {
+            "logicType": "and",
+            "condItems": [
+              {
+                "fieldName": "goodsId",
+                "opType": "equal",
+                "value": goodsId
+              }
+            ]
+          },
+          "sortFields": "sortNum",
+          "sortType": "asc"
+        };
+
+        $http.post(CommonConfig.RestBaseUrl + 'goods/getDetailImgList', queryData, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            console.log('getGoodsDetailImg:result', result);
+
+            var errCode = result.data.code;
+            if (errCode != 'NONE_ERROR') {
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！');
+              return;
+            }
+
+            $scope.goodsDetailInfo.detailImgs = result.data.data;
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      //添加一条明细图片
+      $scope.saveGoodsDetailImg = function () {
+        var formdetailImg = document.getElementById("formdetailImg");
+        formdetailImg.action = CommonConfig.RestBaseUrl + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum;
+        formdetailImg.submit();
+
+        $scope.detailImage.id = '';
+        $scope.detailImage.sortNum = '';
+      };
+
+      //删除明细图片
+      $scope.deleteGoodsDetailImg = function () {
+        $scope.resetSelectStatus();
+        AlertUtil.clearAlert('alertInfo');
+
+        var ids = TableUtil.getSelectedIds('tableDetailImgs', 2, 1, $scope.goodsDetailInfo.detailImgs.length);
+
+        if (ids == null || ids.length == 0) {
+          AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！');
+          return;
+        }
+
+        $http.delete(CommonConfig.RestBaseUrl + 'goods/detailimgs/batchdelete', ids, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            console.log(result);
+            $scope.getData();
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.onSelectAllOrCancel = function () {
+        TableUtil.selectAllOrCncel('tableDetailImgs', !$scope.selectAll, 1, $scope.supplierListData.length);
+        $scope.selectAll = !$scope.selectAll;
+      };
+
+      //重置记录的选择状态
+      $scope.resetSelectStatus = function () {
+        document.getElementById('cbxSelectAllOrCancel').checked = false;
+        $scope.selectAll = false;
+      };
+
+      $scope.init();
+
 
     }]);
 
