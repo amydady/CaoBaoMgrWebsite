@@ -108,7 +108,7 @@
     </form>
 
     <!-- 产品主图 -->
-    <div ng-if="isAdd == false">
+    <div ng-hide="isAdd">
       <div class="row">
         <div class="col-12">
           <h5>主图信息</h5>
@@ -279,10 +279,14 @@
 
               var errCode = result.data.code;
               if (errCode != 'NONE_ERROR') {
-                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！');
+                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！',AlertUtil.defaultTimeout);
                 return;
               }
-              window.location = 'GoodsDetail.html?id=' + result.data.data[0];
+
+              AlertUtil.successWithCloseButton('alertInfo', '提交产品基本信息成功！',AlertUtil.defaultTimeout);
+
+              $scope.goodsDetailInfo.id = result.data.data[0];
+              $scope.isAdd = false;
 
             }).catch(function (result) { //捕捉错误处理
               console.log(result);
@@ -291,11 +295,11 @@
         else {//修改
           $http.put('http://localhost:8006/rest/littlecat/caobao/goods/modify', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              AlertUtil.successWithCloseButton('alertInfo', '修改成功！');
+              AlertUtil.successWithCloseButton('alertInfo', '修改成功！',AlertUtil.defaultTimeout);
 
               console.log(result);
             }).catch(function (result) { //捕捉错误处理
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！');
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！',AlertUtil.defaultTimeout);
               console.log(result);
             });
         }
@@ -331,7 +335,7 @@
 
             var errCode = result.data.code;
             if (errCode != 'NONE_ERROR') {
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！');
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！',AlertUtil.defaultTimeout);
               return;
             }
 
@@ -344,7 +348,7 @@
 
       //添加一条明细图片
       $scope.saveGoodsDetailImg = function () {
-        var formdetailImg = document.getElementById("formdetailImg");
+        var formdetailImg = document.getElementById("formdetailImg",AlertUtil.defaultTimeout);
         formdetailImg.action = CommonConfig.RestBaseUrl + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum;
         formdetailImg.submit();
 
@@ -360,7 +364,7 @@
         var ids = TableUtil.getSelectedIds('tableDetailImgs', 2, 1, $scope.goodsDetailInfo.detailImgs.length);
 
         if (ids == null || ids.length == 0) {
-          AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！');
+          AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！',AlertUtil.defaultTimeout);
           return;
         }
 

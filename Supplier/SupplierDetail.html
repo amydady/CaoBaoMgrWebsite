@@ -135,11 +135,11 @@
 
           $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              AlertUtil.successWithCloseButton('alertInfo','修改成功！');
+              AlertUtil.successWithCloseButton('alertInfo','修改成功！',AlertUtil.defaultTimeout);
 
               console.log(result);
             }).catch(function (result) { //捕捉错误处理
-              AlertUtil.dangerWithCloseButton('alertInfo','修改失败！');
+              AlertUtil.dangerWithCloseButton('alertInfo','修改失败！',AlertUtil.defaultTimeout);
               console.log(result);
             });
         }

@@ -30,7 +30,6 @@
                 <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
                 <button type="button" class="btn btn-success" ng-click='onDisable()'>失 效</button>
-                <button type="button" class="btn btn-success" onclick="onSearch()">查 询</button>
             </div>
         </div>
 
@@ -47,7 +46,6 @@
                             <th scope="col">备 注</th>
                             <th scope="col">创建时间</th>
                             <th scope="col">是否有效</th>
-                            <th scope="col">操 作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,7 +57,6 @@
                             <td>{{x.remark}}</td>
                             <td>{{x.createTime}}</td>
                             <td>{{x.enable=='Y'?'是':'否'}}</td>
-                            <td>XXX</td>
                         </tr>
                     </tbody>
                 </table>
@@ -106,7 +103,6 @@
                         console.log(result);
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
-                        alert(result.data.Message);
                     });
             };
 
@@ -133,7 +129,7 @@
                 var ids = TableUtil.getSelectedIds('tableSupplierList', 2, 1, $scope.supplierListData.length);
 
                 if (ids == null || ids.length == 0) {
-                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！');
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！',AlertUtil.defaultTimeout);
                     return;
                 }
 
@@ -154,7 +150,7 @@
                 var ids = TableUtil.getSelectedIds('tableSupplierList', 2, 1, $scope.supplierListData.length);
 
                 if (ids == null || ids.length == 0) {
-                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！');
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！',AlertUtil.defaultTimeout);
                     return;
                 }
 
@@ -177,21 +173,6 @@
 
             $scope.onInit();
         });
-
-
-
-        function onSearch() {
-            //通过controller来获取Angular应用
-            var appElement = document.querySelector('[ng-controller=myCtrl]');
-            //获取$scope变量
-            var $scope = angular.element(appElement).scope();
-            //调用msg变量，并改变msg的值
-            // $scope.msg = '123456';
-            //上一行改变了msg的值，如果想同步到Angular控制器中，则需要调用$apply()方法即可
-            // $scope.$apply();
-            //调用控制器中的getMenu()方法
-            $scope.getData();
-        };
     </script>
 </body>
 
