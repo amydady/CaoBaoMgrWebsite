@@ -308,7 +308,7 @@
       //修改主图信息
       $scope.saveMainImg = function () {
         var formMainImg = document.getElementById("formMainImg");
-        formMainImg.action = CommonConfig.RestBaseUrl + 'goods/uploadmainimg/' + $scope.goodsDetailInfo.id;
+        formMainImg.action = CommonConfig.RestBaseUrl.CaoBaoService + 'goods/uploadmainimg/' + $scope.goodsDetailInfo.id;
         formMainImg.submit();
       };
 
@@ -329,7 +329,7 @@
           "sortType": "asc"
         };
 
-        $http.post(CommonConfig.RestBaseUrl + 'goods/getDetailImgList', queryData, CommonConfig.httpReqConfig)
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getDetailImgList', queryData, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
             console.log('getGoodsDetailImg:result', result);
 
@@ -349,7 +349,7 @@
       //添加一条明细图片
       $scope.saveGoodsDetailImg = function () {
         var formdetailImg = document.getElementById("formdetailImg",AlertUtil.defaultTimeout);
-        formdetailImg.action = CommonConfig.RestBaseUrl + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum;
+        formdetailImg.action = CommonConfig.RestBaseUrl.CaoBaoService + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum;
         formdetailImg.submit();
 
         $scope.detailImage.id = '';
@@ -368,7 +368,7 @@
           return;
         }
 
-        $http.delete(CommonConfig.RestBaseUrl + 'goods/detailimgs/batchdelete', ids, CommonConfig.httpReqConfig)
+        $http.delete(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/detailimgs/batchdelete', ids, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
             console.log(result);
             $scope.getData();
