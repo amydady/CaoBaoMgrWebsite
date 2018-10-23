@@ -310,7 +310,6 @@
         var fd = new FormData();
         var file = document.getElementById('fileMainImg').files[0];
         fd.append('goodsMainImg', file);
-        // <input type="file" class="custom-file-input" id="fileMainImg" name='goodsMainImg'>
 
         $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/uploadmainimg/' + $scope.goodsDetailInfo.id, fd, CommonConfig.fileUploadReqConfig)
           .then(function (result) {  //正确请求成功时处理
@@ -326,12 +325,6 @@
           }).catch(function (result) { //捕捉错误处理
             console.log(result);
           });
-
-        // var formMainImg = document.getElementById("formMainImg");
-        // formMainImg.action = CommonConfig.RestBaseUrl.CaoBaoService + 'goods/uploadmainimg/' + $scope.goodsDetailInfo.id;
-        // formMainImg.target = "tg";
-        // formMainImg.submit();
-        // $scope.getGoodsDetailInfoById($scope.goodsDetailInfo.id);
       };
 
       //根据产品ID获取产品的明细图片信息
@@ -370,7 +363,6 @@
 
       //添加一条明细图片
       $scope.saveGoodsDetailImg = function () {
-        // <input type="file" class="custom-file-input" id="goodsDetailImg" name='goodsDetailImg'>
         var fd = new FormData();
         var file = document.getElementById('goodsDetailImg').files[0];
         fd.append('goodsDetailImg', file);
@@ -389,15 +381,6 @@
           }).catch(function (result) { //捕捉错误处理
             console.log(result);
           });
-
-        // var formdetailImg = document.getElementById("formdetailImg", AlertUtil.defaultTimeout);
-        // formdetailImg.action = CommonConfig.RestBaseUrl.CaoBaoService + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum;
-        // formdetailImg.target = "tg";
-        // formdetailImg.submit();
-
-        // $scope.detailImage.title = '';
-        // $scope.detailImage.sortNum = '';
-        // $scope.getGoodsDetailImg($scope.goodsDetailInfo.id);
       };
 
       //删除明细图片
