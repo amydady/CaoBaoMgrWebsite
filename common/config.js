@@ -23,5 +23,6 @@ CommonConfig.httpReqConfig = {
 
 // Rest接口基路径定义
 CommonConfig.RestBaseUrl = {
-    CaoBaoService: 'http://47.100.218.102:8006/rest/littlecat/caobao/'
+    // CaoBaoService: 'http://47.100.218.102:8006/rest/littlecat/caobao/'
+    CaoBaoService: 'http://localhost:8006/rest/littlecat/caobao/'
 };
