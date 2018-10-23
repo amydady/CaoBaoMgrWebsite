@@ -9,7 +9,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
-    <title>GoodsList</title>
+    <title>SecKillPlanList</title>
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl">
@@ -17,7 +17,7 @@
         <!-- 页面标题 -->
         <div class="row" style="height:60px">
             <div class="col">
-                <h4>商品列表</h4>
+                <h4>秒杀计划列表</h4>
             </div>
             <div class="col-10" id='alertInfo'>
 
@@ -40,31 +40,27 @@
                     <thead class="bg-primary text-white">
                         <tr>
                             <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                            <th scope="col">序 号</th>
                             <th scope="col" ng-hide={{true}}>ID</th>
-                            <th scope="col">名 称</th>
-                            <th scope="col">概要信息</th>
+                            <th scope="col">商品名称</th>
+                            <th scope="col">开始时间</th>
+                            <th scope="col">结束时间</th>
                             <th scope="col">价 格</th>
+                            <th scope="col">当前库存</th>
+                            <th scope="col">限购数量</th>
                             <th scope="col">创建时间</th>
-                            <th scope="col">是否有效</th>
-                            <th scope="col">业务管理</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="x in listData">
                             <td><input type="checkbox"></td>
-                            <td>{{ $index + 1 }}</td>
                             <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
-                            <td>{{x.summaryDescription}}</td>
+                            <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.goodsName}}</a></td>
+                            <td>{{x.startTime}}</td>
+                            <td>{{x.endTime}}</td>
                             <td>￥{{x.price}}</td>
+                            <td>{{x.currentInventory}}</td>
+                            <td>{{x.limitBuyNum}}</td>
                             <td>{{x.createTime}}</td>
-                            <td>{{x.enable=='Y'?'是':'否'}}</td>
-                            <td>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="secKillMgr(x.id)">秒杀</button>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="groupBuyMgr(x.id)">团购</button>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="inventoryMgr(x.id)">库存</button>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -105,7 +101,7 @@
                     "sortType": "asc"
                 };
 
-                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getList', data, CommonConfig.httpReqConfig)
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getList', data, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
@@ -122,7 +118,7 @@
             };
 
             $scope.add = function () {
-                window.location = "GoodsDetail.html";
+                window.location = "SecKillPlanDetail.html";
             };
 
             //重置记录的选择状态
@@ -171,21 +167,6 @@
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
-            };
-
-            //跳转到秒杀计划维护页面
-            $scope.secKillMgr = function (id) {
-                window.location = 'GoodsDetail.html?id=' + id;
-            };
-
-            //跳转到团购计划维护页面
-            $scope.groupBuyMgr = function (id) {
-                window.location = 'GoodsDetail.html?id=' + id;
-            };
-
-            //跳转到库存维护页面
-            $scope.inventoryMgr = function (id) {
-                window.location = 'GoodsDetail.html?id=' + id;
             };
 
             //页面初始化

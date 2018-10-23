@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+  <title>SecKillPlanDetail</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+  <div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-2">
+        <h4>秒杀计划详情</h4>
+      </div>
+
+      <div class="col-10" id='alertInfo'>
+
+      </div>
+    </div>
+
+    <div class="row" style="height:60px">
+      <div class="col-12">
+        <h5>基本信息</h5>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="inputName" class="col-sm-1 col-form-label">商品名称</label>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputRemark" readonly ng-model="detailInfo.goodsName">
+      </div>
+      <label for="inputRemark" class="col-sm-1 col-form-label">商品价格</label>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputRemark" readonly ng-model="detailInfo.goodsPrice">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="selectSupplier" class="col-sm-1 col-form-label">限购数量</label>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputPrice" placeholder="每人限购的数量" ng-model="detailInfo.limitBuyNum">
+
+      </div>
+      <label for="inputPrice" class="col-sm-1 col-form-label">秒杀价格</label>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputPrice" placeholder="秒杀价格（单位为厘）" ng-model="detailInfo.price">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="selectSupplier" class="col-sm-1 col-form-label">开始时间</label>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputPrice" placeholder="精确到秒：2011-11-11 11:11:11" ng-model="detailInfo.startTime">
+
+      </div>
+      <label for="inputPrice" class="col-sm-1 col-form-label">结束时间</label>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" id="inputPrice" placeholder="精确到秒：2011-11-11 11:11:11" ng-model="detailInfo.endTime">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="selectDeliveryArea" class="col-sm-1 col-form-label">发货区域</label>
+      <div class="col-sm-5">
+        <select class="form-control" ng-model="detailInfo.deliveryAreaId">
+          <option value="-1">请选择...</option>
+          <option ng-repeat="x in deliveryAreaListData" value="{{x.id}}">{{x.name}}</option>
+        </select>
+      </div>
+      <label for="selectDeliveryFeeRule" class="col-sm-1 col-form-label">运费规则</label>
+      <div class="col-sm-5">
+        <select class="form-control" ng-model="detailInfo.deliveryFeeRuleId">
+          <option value="-1">请选择...</option>
+          <option ng-repeat="x in deliveryFeeRuleListData" value="{{x.id}}">{{x.name}}</option>
+        </select>
+      </div>
+    </div>
+
+    <div ng-hide="isAdd">
+      <div class="form-group row">
+        <label for="inputEnable" class="col-sm-1 col-form-label">创建人</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="detailInfo.createOperatorV">
+        </div>
+
+        <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="detailInfo.createTime">
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-11">
+        <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
+      </div>
+    </div>
+  </div>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
+
+  <script>
+    var app = angular.module('myApp', []);
+    CommonConfig.configApp(app);
+
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+      $scope.detailInfo = {
+        goodsId: $location.search().goodsId,
+        id: $location.search().id,
+        createOperatorId: '-1',
+        deliveryAreaId: '-1',
+        deliveryFeeRuleId: '-1'
+      };
+
+      $scope.getGoodsSummayInfoById = function (goodsId) {
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getSummayInfoById?id=' + goodsId)
+          .then(function (result) {  //正确请求成功时处理
+
+            if (result.data.code != "NONE_ERROR") {
+
+            };
+
+            $scope.detailInfo.goodsName = result.data.data[0].name;
+            $scope.detailInfo.goodsPrice = result.data.data[0].price;
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      // 根据ID获取明细信息
+      $scope.getDetailInfoById = function (id) {
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getbyid?id=' + id)
+          .then(function (result) {  //正确请求成功时处理
+
+            $scope.detailInfo = result.data.data[0];
+            $scope.detailInfo.enableV = $scope.detailInfo.enable == 'Y' ? '是' : '否';
+
+            console.log(result);
+            console.log('$scope.detailInfo:', $scope.detailInfo);
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      // 初始化
+      $scope.init = function () {
+        if (StringUtil.isNotEmpty($scope.detailInfo.id)) {
+          //是否为新增
+          $scope.isAdd = false;
+          $scope.getDetailInfoById($scope.detailInfo.id);
+        } else {
+          if (StringUtil.isEmpty($scope.detailInfo.goodsId)) {//新增时，必须传goodsId
+            // alert('新增时，必须传goodsId');
+            // window.location='../Goods/GoodsList.html';
+          }
+          $scope.isAdd = true;
+
+          $scope.getGoodsSummayInfoById($scope.detailInfo.goodsId);
+        }
+      };
+
+      // 提交基本信息
+      $scope.saveData = function () {
+        if ($scope.isAdd) {//新增
+
+          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/add', $scope.detailInfo, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              console.log('saveData:result', result);
+
+              var errCode = result.data.code;
+              if (errCode != 'NONE_ERROR') {
+                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                return;
+              }
+
+              window.location = 'SecKillPlanDetail.html?id=' + result.data.data[0];
+
+            }).catch(function (result) { //捕捉错误处理
+              console.log(result);
+            });
+        }
+        else {//修改
+          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/modify', $scope.detailInfo, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
+
+              console.log(result);
+            }).catch(function (result) { //捕捉错误处理
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+              console.log(result);
+            });
+        }
+      };
+
+      $scope.init();
+
+
+    }]);
+  </script>
+
+</body>
+
+</html>
