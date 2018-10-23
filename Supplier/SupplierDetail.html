@@ -87,7 +87,7 @@
         //是否为新增
         $scope.isAdd = false;
 
-        $http.get('http://localhost:8006/rest/littlecat/caobao/supplier/getbyid?id=' + $scope.supplierInfo.id)
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/getbyid?id=' + $scope.supplierInfo.id)
           .then(function (result) {  //正确请求成功时处理
 
             $scope.supplierInfo.name = result.data.data[0].name;
@@ -118,7 +118,7 @@
             "remark": $scope.supplierInfo.remark
           }
 
-          $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, CommonConfig.httpReqConfig)
+          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', data, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
               window.location = 'SupplierList.html'
             }).catch(function (result) { //捕捉错误处理
@@ -133,7 +133,7 @@
             "enable": $scope.supplierInfo.enable
           }
 
-          $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/modify', data, CommonConfig.httpReqConfig)
+          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/modify', data, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
               AlertUtil.successWithCloseButton('alertInfo','修改成功！',AlertUtil.defaultTimeout);
 

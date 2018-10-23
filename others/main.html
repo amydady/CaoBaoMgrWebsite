@@ -105,7 +105,7 @@
 
         //加载顶级导航菜单
         $scope.loadNavMenu = function () {
-          $http.get('http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=-1')
+          $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=-1')
             .then(function (result) {  //正确请求成功时处理
               $scope.navMenuData = result.data.data;
 
@@ -129,7 +129,7 @@
             pname: pname
           };
 
-          $http.get('http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=' + pid)
+          $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=' + pid)
             .then(function (result) {  //正确请求成功时处理
               $scope.leftMenuData.menuData = result.data.data;
 

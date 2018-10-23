@@ -44,7 +44,7 @@
         $scope.carname = "init";
       };
 
-      $scope.getMenu = $http.get('http://localhost:8006/rest/littlecat/caobao/sys/menu/getbypid?pid=-1',
+      $scope.getMenu = $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=-1',
         {
           params: {
             // name: '张三',

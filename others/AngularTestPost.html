@@ -74,7 +74,7 @@
                     "remark":$scope.supplierInfo.remark
                 }
 
-                $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/add', data, config)
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', data, config)
                     .then(function (result) {  //正确请求成功时处理
                         window.location = 'SupplierList.html'
                     }).catch(function (result) { //捕捉错误处理

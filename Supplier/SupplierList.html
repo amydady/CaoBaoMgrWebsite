@@ -96,7 +96,7 @@
                     "sortType": "asc"
                 };
 
-                $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/getList', data, CommonConfig.httpReqConfig)
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/getList', data, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.supplierListData = result.data.data
 
@@ -133,7 +133,7 @@
                     return;
                 }
 
-                $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/batchdisable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/batchdisable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -154,7 +154,7 @@
                     return;
                 }
 
-                $http.put('http://localhost:8006/rest/littlecat/caobao/supplier/batchenable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/batchenable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();

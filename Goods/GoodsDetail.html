@@ -14,7 +14,10 @@
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl">
+
   <div class="container-fluid">
+
+
     <!-- 页面标题 -->
     <div class="row" style="height:60px">
       <div class="col-2">
@@ -109,6 +112,7 @@
 
     <!-- 产品主图 -->
     <div ng-hide="isAdd">
+      <hr />
       <div class="row">
         <div class="col-12">
           <h5>主图信息</h5>
@@ -116,9 +120,11 @@
       </div>
       <form id="formMainImg" method="POST" enctype="multipart/form-data">
         <div class="form-group row">
-          <label for="inputName" class="col-sm-1 col-form-label">产品主图上传</label>
-          <div class="col-sm-5">
-            <input type="file" class="form-control" id="fileMainImg" name='goodsMainImg'>
+          <div class="col">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="fileMainImg" name='goodsMainImg'>
+              <label class="custom-file-label" for="customFile">请选择产品主图...</label>
+            </div>
           </div>
           <button type="submit" class="btn btn-primary" ng-click="saveMainImg()">确 定</button>
         </div>
@@ -132,62 +138,66 @@
 
     <!-- 明细图片 -->
     <div ng-hide="{{isAdd}}">
-      <br />
+      <hr />
       <div class="row">
         <div class="col-12">
-          <h5>明细图片</h5>
+          <h5>明细图片信息</h5>
         </div>
       </div>
-      <div class="form-group row">
+      <div class="row">
         <label for="inputEnable" class="col-sm-1 col-form-label">标 题</label>
-        <div class="col-sm-5">
+        <div class="col-sm-2">
           <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="detailImage.title">
         </div>
 
         <label for="inputCreateTime" class="col-sm-1 col-form-label">排序编号</label>
-        <div class="col-sm-5">
+        <div class="col-sm-2">
           <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="detailImage.sortNum">
         </div>
 
-      </div>
-
-      <form id="formdetailImg" method="POST" enctype="multipart/form-data">
-        <div class="form-group row">
-          <label for="goodsDetailImg" class="col-sm-1 col-form-label">产品明细图片上传</label>
-          <div class="col-sm-11">
-            <input type="file" class="form-control" id='goodsDetailImg' name='goodsDetailImg'>
-          </div>
-          <button type="submit" class="btn btn-primary" ng-click="saveGoodsDetailImg()">添 加</button>
-          <button class="btn btn-primary" ng-click="deleteGoodsDetailImg()">删 除</button>
+        <label for="inputCreateTime" class="col-sm-1 col-form-label">图片信息</label>
+        <div class="col-sm-4">
+          <form class="form-group row" id="formdetailImg" method="POST" enctype="multipart/form-data">
+            <div class="col">
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="goodsDetailImg" name='goodsDetailImg'>
+                <label class="custom-file-label" for="goodsDetailImg">请选择产品明细图片...</label>
+              </div>
+            </div>
+          </form>
         </div>
-      </form>
-
-      <div class="row">
-        <div class="col">
-          <table class="table table-striped table-hover" id="tableDetailImgs">
-            <thead class="bg-primary text-white">
-              <tr>
-                <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                <th scope="col">序 号</th>
-                <th scope="col" ng-hide={{true}}>ID</th>
-                <th scope="col">标 题</th>
-                <th scope="col">预 览</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="x in goodsDetailInfo.detailImgs">
-                <td><input type="checkbox"></td>
-                <td>{{x.sortNum}}</td>
-                <td ng-hide={{true}}>{{x.id}}</td>
-                <td>{{x.title}}</td>
-                <td><img src="data:image/png;base64,{{x.imgData}}" alt="尚未上传产品图片" /></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <div class="col-sm-1"> <button class="btn btn-primary" ng-click="saveGoodsDetailImg()">添 加</button></div>
       </div>
-
     </div>
+
+    <hr />
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-success" ng-click="deleteGoodsDetailImg()">删 除</button>
+        <table class="table table-striped table-hover" id="tableDetailImgs">
+          <thead class="bg-primary text-white">
+            <tr>
+              <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+              <th scope="col">序 号</th>
+              <th scope="col" ng-hide={{true}}>ID</th>
+              <th scope="col">标 题</th>
+              <th scope="col">预 览</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="x in goodsDetailInfo.detailImgs">
+              <td><input type="checkbox"></td>
+              <td>{{x.sortNum}}</td>
+              <td ng-hide={{true}}>{{x.id}}</td>
+              <td>{{x.title}}</td>
+              <td><img src="data:image/png;base64,{{x.imgData}}" alt="尚未上传产品图片" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
 
   </div>
 
@@ -229,7 +239,7 @@
           "sortType": "asc"
         };
 
-        $http.post('http://localhost:8006/rest/littlecat/caobao/supplier/getList', data, CommonConfig.httpReqConfig)
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/getList', data, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
             $scope.supplierListData = result.data.data;
 
@@ -242,7 +252,7 @@
 
       // 根据产品ID获取产品明细信息
       $scope.getGoodsDetailInfoById = function (id) {
-        $http.get('http://localhost:8006/rest/littlecat/caobao/goods/getbyid?id=' + id)
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getbyid?id=' + id)
           .then(function (result) {  //正确请求成功时处理
 
             $scope.goodsDetailInfo = result.data.data[0];
@@ -273,17 +283,17 @@
       $scope.saveData = function () {
         if ($scope.isAdd) {//新增
 
-          $http.post('http://localhost:8006/rest/littlecat/caobao/goods/add', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
+          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/add', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
               console.log('saveData:result', result);
 
               var errCode = result.data.code;
               if (errCode != 'NONE_ERROR') {
-                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！',AlertUtil.defaultTimeout);
+                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
                 return;
               }
 
-              AlertUtil.successWithCloseButton('alertInfo', '提交产品基本信息成功！',AlertUtil.defaultTimeout);
+              AlertUtil.successWithCloseButton('alertInfo', '提交产品基本信息成功！', AlertUtil.defaultTimeout);
 
               $scope.goodsDetailInfo.id = result.data.data[0];
               $scope.isAdd = false;
@@ -293,13 +303,13 @@
             });
         }
         else {//修改
-          $http.put('http://localhost:8006/rest/littlecat/caobao/goods/modify', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
+          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/modify', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              AlertUtil.successWithCloseButton('alertInfo', '修改成功！',AlertUtil.defaultTimeout);
+              AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
 
               console.log(result);
             }).catch(function (result) { //捕捉错误处理
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！',AlertUtil.defaultTimeout);
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
               console.log(result);
             });
         }
@@ -335,7 +345,7 @@
 
             var errCode = result.data.code;
             if (errCode != 'NONE_ERROR') {
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！',AlertUtil.defaultTimeout);
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
               return;
             }
 
@@ -348,7 +358,7 @@
 
       //添加一条明细图片
       $scope.saveGoodsDetailImg = function () {
-        var formdetailImg = document.getElementById("formdetailImg",AlertUtil.defaultTimeout);
+        var formdetailImg = document.getElementById("formdetailImg", AlertUtil.defaultTimeout);
         formdetailImg.action = CommonConfig.RestBaseUrl.CaoBaoService + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum;
         formdetailImg.submit();
 
@@ -364,7 +374,7 @@
         var ids = TableUtil.getSelectedIds('tableDetailImgs', 2, 1, $scope.goodsDetailInfo.detailImgs.length);
 
         if (ids == null || ids.length == 0) {
-          AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！',AlertUtil.defaultTimeout);
+          AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
           return;
         }
 
