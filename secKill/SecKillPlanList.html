@@ -28,8 +28,7 @@
         <div class="row">
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
-                <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
-                <button type="button" class="btn btn-success" ng-click='onDisable()'>失 效</button>
+                <button type="button" class="btn btn-success" ng-click='onDelete()'>删 除</button>
             </div>
         </div>
 
@@ -54,7 +53,7 @@
                         <tr ng-repeat="x in listData">
                             <td><input type="checkbox"></td>
                             <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="SecKillPlanDetail.html?id={{x.id}}">{{x.goodsName}}</a></td>
+                            <th scope="row"><a href="SecKillPlanDetail.html?id={{x.id}}">{{x.goodsName}}</a></th>
                             <td>{{x.startTime}}</td>
                             <td>{{x.endTime}}</td>
                             <td>￥{{x.price}}</td>
@@ -81,17 +80,23 @@
     <script>
         var app = angular.module('myApp', []);
 
-        app.controller('myCtrl', function ($scope, $http) {
+        app.controller('myCtrl', ['$scope', '$http', function ($scope, $http) {
+            $scope.goodsId = RequestUtil.getQueryParamByName('goodsId');
+
+            // console.log("controller:$scope.goodsId",$scope.goodsId);
+
+            if (StringUtil.isEmpty($scope.goodsId)) {
+                $scope.goodsId = '';
+            }
 
             $scope.getData = function () {
-                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getList4WxApp')
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getList4WebApp?goodsId=' + $scope.goodsId)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
                         console.log(result);
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
-                        alert(result.data.Message);
                     });
             };
 
@@ -101,7 +106,7 @@
             };
 
             $scope.add = function () {
-                window.location = "SecKillPlanDetail.html";
+                window.location = "SecKillPlanDetail.html?goodsId=" + $scope.goodsId;
             };
 
             //重置记录的选择状态
@@ -110,40 +115,20 @@
                 $scope.selectAll = false;
             }
 
-            //置失效
-            $scope.onDisable = function () {
+
+            //删除
+            $scope.onDelete = function () {
                 $scope.resetSelectStatus();
                 AlertUtil.clearAlert('alertInfo');
 
-                var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.listData.length);
+                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/batchdisable', ids, CommonConfig.httpReqConfig)
-                    .then(function (result) {  //正确请求成功时处理
-                        console.log(result);
-                        $scope.getData();
-                    }).catch(function (result) { //捕捉错误处理
-                        console.log(result);
-                    });
-            };
-
-            //置生效
-            $scope.onEnable = function () {
-                $scope.resetSelectStatus();
-                AlertUtil.clearAlert('alertInfo');
-
-                var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.listData.length);
-
-                if (ids == null || ids.length == 0) {
-                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
-                    return;
-                }
-
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/batchenable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/batchdelete', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -155,7 +140,7 @@
             //页面初始化
             $scope.selectAll = false;
             $scope.getData();
-        });
+        }]);
     </script>
 
 </body>

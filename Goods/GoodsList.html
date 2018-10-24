@@ -88,24 +88,8 @@
         app.controller('myCtrl', function ($scope, $http) {
 
             $scope.getData = function () {
-                var data = {
-                    "condition": {
-                        "logicType": "and",
-                        "condItems": [
-                            {
 
-                            }
-                        ]
-                    },
-                    "pageParam": {
-                        "pageSize": 40,
-                        "pageIndex": 1
-                    },
-                    "sortFields": "createTime",
-                    "sortType": "asc"
-                };
-
-                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getList', data, CommonConfig.httpReqConfig)
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getList4WebApp')
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
@@ -175,7 +159,7 @@
 
             //跳转到秒杀计划维护页面
             $scope.secKillMgr = function (id) {
-                window.location = 'GoodsDetail.html?id=' + id;
+                window.location = '../secKill/SecKillPlanList.html?goodsId=' + id;
             };
 
             //跳转到团购计划维护页面
