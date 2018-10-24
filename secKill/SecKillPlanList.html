@@ -54,7 +54,7 @@
                         <tr ng-repeat="x in listData">
                             <td><input type="checkbox"></td>
                             <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.goodsName}}</a></td>
+                            <th scope="row"><a href="SecKillPlanDetail.html?id={{x.id}}">{{x.goodsName}}</a></td>
                             <td>{{x.startTime}}</td>
                             <td>{{x.endTime}}</td>
                             <td>￥{{x.price}}</td>
@@ -84,24 +84,7 @@
         app.controller('myCtrl', function ($scope, $http) {
 
             $scope.getData = function () {
-                var data = {
-                    "condition": {
-                        "logicType": "and",
-                        "condItems": [
-                            {
-
-                            }
-                        ]
-                    },
-                    "pageParam": {
-                        "pageSize": 40,
-                        "pageIndex": 1
-                    },
-                    "sortFields": "createTime",
-                    "sortType": "asc"
-                };
-
-                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getList', data, CommonConfig.httpReqConfig)
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getList4WxApp')
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
