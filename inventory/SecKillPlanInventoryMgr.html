@@ -9,7 +9,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
-    <title>GoodsInventoryMgr</title>
+    <title>SecKillPlanInventoryMgr</title>
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl">
@@ -17,12 +17,25 @@
         <!-- 页面标题 -->
         <div class="row" style="height:60px">
             <div class="col">
-                <h4>商品库存管理</h4>
+                <h4>秒杀库存管理</h4>
             </div>
             <div class="col-10" id='alertInfo'>
 
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-3">
+                <h5>商品：{{goodsName}}</h5>
+            </div>
+            <div class="col-3">
+                <h5>计划开始：{{planStartTime}}</h5>
+            </div>
+            <div class="col-3">
+                <h5>计划结束：{{planEndTime}}</h5>
+            </div>
+        </div>
+<hr/>
 
         <form>
             <div class="form-group row">
@@ -37,6 +50,7 @@
 
                 <div class="col-sm-2">
                     <button class="btn btn-success" ng-click="saveData()">确 定</button>
+                    <button class="btn btn-success" ng-click="back2PlanList()">返回秒杀计划</button>
                 </div>
             </div>
 
@@ -51,7 +65,6 @@
                         <tr>
                             <th scope="col">序 号</th>
                             <th scope="col" ng-hide={{true}}>ID</th>
-                            <th scope="col">调整类型</th>
                             <th scope="col">调整数量</th>
                             <th scope="col">备注信息</th>
                             <th scope="col">调整时间</th>
@@ -59,9 +72,8 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="x in listData">
-                            <td>#{{ $index + 1 }}</td>
+                            <td>{{ $index + 1 }}</td>
                             <td ng-hide={{true}}>{{x.id}}</td>
-                            <td>{{x.changeTypeV}}</td>
                             <th scope="row">{{x.changeValue}}</th>
                             <td>{{x.description}}</td>
                             <td>{{x.createTime}}</td>
@@ -105,46 +117,43 @@
     <script>
         var app = angular.module('myApp', []);
 
+        // 告警框关闭事件
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            window.location = '../secKill/SecKillPlanList.html';
+        });
+
         app.controller('myCtrl', function ($scope, $http) {
 
-            $scope.goodsId = RequestUtil.getQueryParamByName('goodsId');
+            $scope.planId = RequestUtil.getQueryParamByName('planId');
 
 
-            if (StringUtil.isEmpty($scope.goodsId)) {
-                $scope.modalContent = '请选择商品进行库存维护！';
+            if (StringUtil.isEmpty($scope.planId)) {
+                $scope.modalContent = '请选择秒杀计划进行库存维护！';
                 $('#myModal').modal('show');
             }
 
-            // 告警框关闭事件
-            $('#myModal').on('hidden.bs.modal', function (e) {
-                window.location = '../Goods/GoodsList.html';
-            });
+            
 
+            $scope.getSecKillPlanDetailInfoById = function (id) {
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getbyid?id=' + id)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.goodsId = result.data.data[0].goodsId;
+                        $scope.goodsName = result.data.data[0].goodsName;
+                        $scope.planStartTime = result.data.data[0].startTime;
+                        $scope.planEndTime = result.data.data[0].endTime;
 
-            $scope.getData = function (goodsId) {
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
 
-                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/goods/getListByGoodsId?goodsId=' + goodsId)
+            $scope.getSecKillPlanDetailInfoById($scope.planId);
+
+            $scope.getData = function (planId) {
+
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/seckill/getListByPlanId?planId=' + planId)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
-
-                        for (var i = 0; i < $scope.listData.length; i++) {
-                            var data = $scope.listData[i];
-                            if (data.changeType == 'rengongzengjia') {
-                                data.changeTypeV = '人工增加';
-                            }
-
-                            if (data.changeType == 'rengongjianshao') {
-                                data.changeTypeV = '人工减少';
-                            }
-
-                            if (data.changeType == 'miaoshaguihuakouchu') {
-                                data.changeTypeV = '秒杀规划扣除';
-                            }
-
-                            if (data.changeType == 'miaoshaguihuatuihuan') {
-                                data.changeTypeV = '秒杀规划退还';
-                            }
-                        };
 
                         console.log(result);
                     }).catch(function (result) { //捕捉错误处理
@@ -156,9 +165,9 @@
             $scope.saveData = function () {
                 $scope.detailInfo.changeType = $scope.detailInfo.changeValue > 0 ? 'rengongzengjia' : 'rengongjianshao';
                 $scope.detailInfo.operatorId = 'todo';
-                $scope.detailInfo.goodsId = $scope.goodsId;
+                $scope.detailInfo.planId = $scope.planId;
 
-                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/goods/add', $scope.detailInfo, CommonConfig.httpReqConfig)
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/seckill/add', $scope.detailInfo, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log('saveData:result', result);
 
@@ -168,7 +177,7 @@
                             return;
                         }
                         AlertUtil.successWithCloseButton('alertInfo', '添加库存变更成功！', AlertUtil.defaultTimeout);
-                        $scope.getData($scope.goodsId);
+                        $scope.getData($scope.planId);
 
                         $scope.detailInfo.changeValue = '';
                         $scope.detailInfo.description = '';
@@ -179,9 +188,13 @@
                     });
             };
 
+            $scope.back2PlanList = function () {
+                window.location = '../secKill/SecKillPlanList.html?goodsId=' + $scope.goodsId;
+            };
+
 
             //页面初始化
-            $scope.getData($scope.goodsId);
+            $scope.getData($scope.planId);
         });
     </script>
 

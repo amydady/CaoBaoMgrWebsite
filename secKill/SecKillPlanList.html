@@ -26,9 +26,13 @@
 
         <!-- 操作按钮 -->
         <div class="row">
-            <div class="col" align="right">
+            <div class="col-4" align="left">
+                <h4>商品：{{goodsName}}</h4>
+            </div>
+            <div class="col-8" align="right">
                 <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
-                <button type="button" class="btn btn-success" ng-click='onDelete()'>删 除</button>
+                <button type="button" class="btn btn-success" ng-click='onDisable()'>失 效</button>
+                <button type="button" class="btn btn-success" ng-click='back2GoodsList()'>返回商品列表</button>
             </div>
         </div>
         <hr />
@@ -40,32 +44,60 @@
                         <tr>
                             <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
                             <th scope="col" ng-hide={{true}}>ID</th>
-                            <th scope="col">商品名称</th>
+                            <th scope="col">序 号</th>
                             <th scope="col">开始时间</th>
                             <th scope="col">结束时间</th>
                             <th scope="col">价 格</th>
-                            <th scope="col">秒杀库存</th>
+                            <th scope="col">规划库存</th>
+                            <th scope="col">实际库存</th>
                             <th scope="col">限购数量</th>
                             <th scope="col">创建时间</th>
+                            <th scope="col">是否有效</th>
+                            <th scope="col">业务管理</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="x in listData">
                             <td><input type="checkbox"></td>
                             <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="SecKillPlanDetail.html?id={{x.id}}">{{x.goodsName}}</a></th>
+                            <th scope="row"><a href="SecKillPlanDetail.html?id={{x.id}}">#{{$index+1}}</a></th>
                             <td>{{x.startTime}}</td>
                             <td>{{x.endTime}}</td>
                             <td>￥{{x.price}}</td>
+                            <td>{{x.planInventory}}</td>
                             <td>{{x.currentInventory}}</td>
                             <td>{{x.limitBuyNum}}</td>
                             <td>{{x.createTime}}</td>
+                            <td>{{x.enable=='Y'?'是':'否'}}</td>
+                            <td>
+                                <button type="button" class="btn btn-secondary btn-sm" ng-click="inventoryMgr(x.id,x.goodsId)">库存</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{modalContent}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -83,11 +115,23 @@
         app.controller('myCtrl', ['$scope', '$http', function ($scope, $http) {
             $scope.goodsId = RequestUtil.getQueryParamByName('goodsId');
 
-            // console.log("controller:$scope.goodsId",$scope.goodsId);
-
             if (StringUtil.isEmpty($scope.goodsId)) {
-                $scope.goodsId = '';
+                $scope.modalContent = '请选择商品进行秒杀计划维护！';
+                $('#myModal').modal('show');
             }
+
+            $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getbyid?id=' + $scope.goodsId)
+                .then(function (result) {  //正确请求成功时处理
+                    $scope.goodsName = result.data.data[0].name;
+                }).catch(function (result) { //捕捉错误处理
+                    console.log(result);
+                });
+
+
+            // 告警框关闭事件
+            $('#myModal').on('hidden.bs.modal', function (e) {
+                window.location = '../Goods/GoodsList.html';
+            });
 
             $scope.getData = function () {
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getList4WebApp?goodsId=' + $scope.goodsId)
@@ -117,7 +161,7 @@
 
 
             //删除
-            $scope.onDelete = function () {
+            $scope.onDisable = function () {
                 $scope.resetSelectStatus();
                 AlertUtil.clearAlert('alertInfo');
 
@@ -128,13 +172,22 @@
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/batchdelete', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/batchdisable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
+            };
+
+            //跳转到秒杀库存维护页面
+            $scope.inventoryMgr = function (id, goodsId) {
+                window.location = '../inventory/SecKillPlanInventoryMgr.html?planId=' + id + '&goodsId=' + goodsId;
+            };
+
+            $scope.back2GoodsList=function(){
+                window.location = '../Goods/GoodsList.html';
             };
 
             //页面初始化

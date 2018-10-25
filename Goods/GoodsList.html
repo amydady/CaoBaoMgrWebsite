@@ -32,7 +32,7 @@
                 <button type="button" class="btn btn-success" ng-click='onDisable()'>失 效</button>
             </div>
         </div>
-
+        <hr />
         <!-- 数据区域 -->
         <div class="row">
             <div class="col">
@@ -40,7 +40,6 @@
                     <thead class="bg-primary text-white">
                         <tr>
                             <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                            <th scope="col">序 号</th>
                             <th scope="col" ng-hide={{true}}>ID</th>
                             <th scope="col">名 称</th>
                             <th scope="col">概要信息</th>
@@ -54,7 +53,6 @@
                     <tbody>
                         <tr ng-repeat="x in listData">
                             <td><input type="checkbox"></td>
-                            <td>{{ $index + 1 }}</td>
                             <td ng-hide={{true}}>{{x.id}}</td>
                             <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
                             <td>{{x.summaryDescription}}</td>
