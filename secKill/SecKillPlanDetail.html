@@ -33,49 +33,49 @@
     </div>
 
     <div class="form-group row">
-      <label for="inputName" class="col-sm-1 col-form-label">商品名称</label>
-      <div class="col-sm-5">
+      <label for="inputName" class="col-sm-2 col-form-label">商品名称</label>
+      <div class="col-sm-4">
         <input type="text" class="form-control" id="inputRemark" readonly ng-model="detailInfo.goodsName">
       </div>
-      <label for="inputRemark" class="col-sm-1 col-form-label">商品价格</label>
-      <div class="col-sm-5">
+      <label for="inputRemark" class="col-sm-2 col-form-label">商品价格</label>
+      <div class="col-sm-4">
         <input type="text" class="form-control" id="inputRemark" readonly ng-model="detailInfo.goodsPrice">
       </div>
     </div>
     <div class="form-group row">
-      <label for="selectSupplier" class="col-sm-1 col-form-label">限购数量</label>
-      <div class="col-sm-5">
+      <label for="selectSupplier" class="col-sm-2 col-form-label">限购数量</label>
+      <div class="col-sm-4">
         <input type="text" class="form-control" id="inputPrice" placeholder="每人限购的数量" ng-model="detailInfo.limitBuyNum">
 
       </div>
-      <label for="inputPrice" class="col-sm-1 col-form-label">秒杀价格</label>
-      <div class="col-sm-5">
+      <label for="inputPrice" class="col-sm-2 col-form-label">秒杀价格</label>
+      <div class="col-sm-4">
         <input type="text" class="form-control" id="inputPrice" placeholder="秒杀价格（单位为厘）" ng-model="detailInfo.price">
       </div>
     </div>
 
     <div class="form-group row">
-      <label for="selectSupplier" class="col-sm-1 col-form-label">开始时间</label>
-      <div class="col-sm-5">
+      <label for="selectSupplier" class="col-sm-2 col-form-label">开始时间</label>
+      <div class="col-sm-4">
         <input type="text" class="form-control" id="inputPrice" placeholder="精确到秒：2011-11-11 11:11:11" ng-model="detailInfo.startTime">
 
       </div>
-      <label for="inputPrice" class="col-sm-1 col-form-label">结束时间</label>
-      <div class="col-sm-5">
+      <label for="inputPrice" class="col-sm-2 col-form-label">结束时间</label>
+      <div class="col-sm-4">
         <input type="text" class="form-control" id="inputPrice" placeholder="精确到秒：2011-11-11 11:11:11" ng-model="detailInfo.endTime">
       </div>
     </div>
 
     <div class="form-group row">
-      <label for="selectDeliveryArea" class="col-sm-1 col-form-label">发货区域</label>
-      <div class="col-sm-5">
+      <label for="selectDeliveryArea" class="col-sm-2 col-form-label">发货区域</label>
+      <div class="col-sm-4">
         <select class="form-control" ng-model="detailInfo.deliveryAreaId">
           <option value="-1">请选择...</option>
           <option ng-repeat="x in deliveryAreaListData" value="{{x.id}}">{{x.name}}</option>
         </select>
       </div>
-      <label for="selectDeliveryFeeRule" class="col-sm-1 col-form-label">运费规则</label>
-      <div class="col-sm-5">
+      <label for="selectDeliveryFeeRule" class="col-sm-2 col-form-label">运费规则</label>
+      <div class="col-sm-4">
         <select class="form-control" ng-model="detailInfo.deliveryFeeRuleId">
           <option value="-1">请选择...</option>
           <option ng-repeat="x in deliveryFeeRuleListData" value="{{x.id}}">{{x.name}}</option>
@@ -85,20 +85,22 @@
 
     <div ng-hide="isAdd">
       <div class="form-group row">
-        <label for="inputEnable" class="col-sm-1 col-form-label">创建人</label>
-        <div class="col-sm-5">
+        <label for="inputEnable" class="col-sm-2 col-form-label">创建人</label>
+        <div class="col-sm-4">
           <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="detailInfo.createOperatorV">
         </div>
 
-        <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
-        <div class="col-sm-5">
+        <label for="inputCreateTime" class="col-sm-2 col-form-label">创建时间</label>
+        <div class="col-sm-4">
           <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="detailInfo.createTime">
         </div>
       </div>
     </div>
     <div class="form-group row">
       <div class="col-sm-11">
-        <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
+        <button class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
+        <button class="btn btn-primary" ng-click="back2List()">返回列表</button>
+
       </div>
     </div>
   </div>
@@ -114,7 +116,7 @@
           </button>
         </div>
         <div class="modal-body">
-          请选择指定的商品进行秒杀计划设置！
+          {{modalContent}}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
@@ -159,6 +161,7 @@
           .then(function (result) {  //正确请求成功时处理
 
             if (result.data.code != "NONE_ERROR") {
+              $scope.modalContent = '请选择指定的商品进行秒杀计划设置！';
               $('#myModal').modal('show');
             };
 
@@ -194,13 +197,16 @@
           $scope.getDetailInfoById($scope.detailInfo.id);
         } else {
           if (StringUtil.isEmpty($scope.detailInfo.goodsId)) {//新增时，必须传goodsId
-            // alert('新增时，必须传goodsId');
-            // window.location='../Goods/GoodsList.html';
+            $('#myModal').modal('show');
           }
           $scope.isAdd = true;
 
           $scope.getGoodsSummayInfoById($scope.detailInfo.goodsId);
         }
+      };
+
+      $scope.back2List = function () {
+        window.location = 'SeckillPlanList.html?goodsId=' + $scope.detailInfo.goodsId;
       };
 
       // 提交基本信息

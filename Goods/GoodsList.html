@@ -45,6 +45,7 @@
                             <th scope="col">名 称</th>
                             <th scope="col">概要信息</th>
                             <th scope="col">价 格</th>
+                            <th scope="col">可用库存</th>
                             <th scope="col">创建时间</th>
                             <th scope="col">是否有效</th>
                             <th scope="col">业务管理</th>
@@ -58,11 +59,11 @@
                             <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
                             <td>{{x.summaryDescription}}</td>
                             <td>￥{{x.price}}</td>
+                            <td>￥{{x.currentInventory}}</td>
                             <td>{{x.createTime}}</td>
                             <td>{{x.enable=='Y'?'是':'否'}}</td>
                             <td>
                                 <button type="button" class="btn btn-secondary btn-sm" ng-click="secKillMgr(x.id)">秒杀</button>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="groupBuyMgr(x.id)">团购</button>
                                 <button type="button" class="btn btn-secondary btn-sm" ng-click="inventoryMgr(x.id)">库存</button>
                             </td>
                         </tr>
@@ -167,9 +168,9 @@
                 window.location = 'GoodsDetail.html?id=' + id;
             };
 
-            //跳转到库存维护页面
+            //跳转到商品库存维护页面
             $scope.inventoryMgr = function (id) {
-                window.location = 'GoodsDetail.html?id=' + id;
+                window.location = '../inventory/GoodsInventoryMgr.html?goodsId=' + id;
             };
 
             //页面初始化

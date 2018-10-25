@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+    <title>GoodsInventoryMgr</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <div class="container-fluid">
+        <!-- 页面标题 -->
+        <div class="row" style="height:60px">
+            <div class="col">
+                <h4>商品库存管理</h4>
+            </div>
+            <div class="col-10" id='alertInfo'>
+
+            </div>
+        </div>
+
+        <form>
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-2 col-form-label">调整数量</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="inputName" placeholder="调增填正数，调减填负数" ng-model="detailInfo.changeValue">
+                </div>
+                <label for="inputRemark" class="col-sm-2 col-form-label">调整描述</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="inputRemark" placeholder="库存调整备注信息" ng-model="detailInfo.description">
+                </div>
+
+                <div class="col-sm-2">
+                    <button class="btn btn-primary" ng-click="saveData()">确 定</button>
+                </div>
+            </div>
+
+        </form>
+        <hr />
+
+        <!-- 数据区域 -->
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover" id="table">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th scope="col">序 号</th>
+                            <th scope="col" ng-hide={{true}}>ID</th>
+                            <th scope="col">调整数量</th>
+                            <th scope="col">备注信息</th>
+                            <th scope="col">调整时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in listData">
+                            <td>{{ $index + 1 }}</td>
+                            <td ng-hide={{true}}>{{x.id}}</td>
+                            <th scope="row">{{x.changeValue}}</th>
+                            <td>{{x.description}}</td>
+                            <td>{{x.createTime}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{modalContent}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../lib/jquery/jquery.3.2.1.js"></script>
+    <script src="../lib/popper/popper.1.12.9.js"></script>
+    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/angular-1.7.5/angular.min.js"></script>
+    <script src="../common/littleCatCommon.js"></script>
+
+    <script>
+        var app = angular.module('myApp', []);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.goodsId = RequestUtil.getQueryParamByName('goodsId');
+
+
+            if (StringUtil.isEmpty($scope.goodsId)) {
+                $scope.modalContent = '请选择商品进行库存维护！';
+                $('#myModal').modal('show');
+            }
+
+            // 告警框关闭事件
+            $('#myModal').on('hidden.bs.modal', function (e) {
+                window.location = '../Goods/GoodsList.html';
+            });
+
+
+            $scope.getData = function (goodsId) {
+
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/goods/getListByGoodsId?goodsId=' + goodsId)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.listData = result.data.data
+
+                        console.log(result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                        alert(result.data.Message);
+                    });
+            };
+
+            $scope.saveData = function () {
+                $scope.detailInfo.changeType = $scope.detailInfo.changeValue > 0 ? 'rengongzengjia' : 'rengongjianshao';
+                $scope.detailInfo.operatorId = 'todo';
+                $scope.detailInfo.goodsId = $scope.goodsId;
+
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/goods/add', $scope.detailInfo, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log('saveData:result', result);
+
+                        var errCode = result.data.code;
+                        if (errCode != 'NONE_ERROR') {
+                            AlertUtil.dangerWithCloseButton('alertInfo', '添加库存变更失败！', AlertUtil.defaultTimeout);
+                            return;
+                        }
+                        AlertUtil.successWithCloseButton('alertInfo', '添加库存变更成功！', AlertUtil.defaultTimeout);
+                        $scope.getData($scope.goodsId);
+
+                        $scope.detailInfo.changeValue = '';
+                        $scope.detailInfo.description = '';
+
+
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+
+            //页面初始化
+            $scope.getData($scope.goodsId);
+        });
+    </script>
+
+</body>
+
+</html>

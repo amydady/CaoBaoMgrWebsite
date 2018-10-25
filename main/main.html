@@ -12,13 +12,13 @@
   <title>CaoBaoServiceMain</title>
 
   <style>
-    .navbar{
-      font-size:x-large;
-    }
-    .card-header{
-      font-size:larger;
+    .navbar {
+      font-size: x-large;
     }
 
+    .card-header {
+      font-size: larger;
+    }
   </style>
 </head>
 
@@ -66,7 +66,7 @@
       <!-- content -->
       <div class="col-10">
         <div>
-          <iframe id="if_content" src="../Supplier/SupplierList.html" style="width:100%;height: 2000px" frameborder='0'
+          <iframe id="if_content" src="" style="width:100%;height: 1500px" frameborder='0'
             name="if_content"></iframe>
         </div>
       </div>
@@ -109,14 +109,17 @@
             .then(function (result) {  //正确请求成功时处理
               $scope.navMenuData = result.data.data;
 
-              for (var i = 0; i < $scope.navMenuData.length; i++) {
-                if ($scope.navMenuData[i].isDefault == 'Y') {
-                  $scope.menuId = $scope.navMenuData[i].id;
-                  $scope.menuName = $scope.navMenuData[i].name;
+              if (StringUtil.isEmpty($scope.menuId)) {
+                for (var i = 0; i < $scope.navMenuData.length; i++) {
+                  if ($scope.navMenuData[i].isDefault == 'Y') {
+                    $scope.menuId = $scope.navMenuData[i].id;
+                    $scope.menuName = $scope.navMenuData[i].name;
+                    break;
+                  }
                 }
               }
 
-              console.log(' $scope.navMenuData:', $scope.navMenuData);
+              $scope.loadLeftMenu($scope.menuId, $scope.menuName);
 
             }).catch(function (result) { //捕捉错误处理
               console.log(result);
@@ -148,9 +151,6 @@
         };
 
         $scope.loadNavMenu();
-
-        //加载默认左侧菜单
-        $scope.loadLeftMenu($scope.menuId, $scope.menuName);
 
       }]);
 
