@@ -35,7 +35,7 @@
                 <h5>计划结束：{{planEndTime}}</h5>
             </div>
         </div>
-<hr/>
+        <hr />
 
         <form>
             <div class="form-group row">
@@ -132,7 +132,7 @@
                 $('#myModal').modal('show');
             }
 
-            
+
 
             $scope.getSecKillPlanDetailInfoById = function (id) {
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getbyid?id=' + id)
