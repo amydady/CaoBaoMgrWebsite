@@ -60,6 +60,8 @@
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
                 <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
+                <button type="button" class="btn btn-success" ng-click='back2GoodsList()'>返回商品列表</button>
+
             </div>
         </div>
         <hr />
@@ -181,15 +183,27 @@
                 $scope.isAdd = true;
                 $scope.detailInfo = {
                     id: '',
-                    name: ''
+                    goodsId: $scope.goodsId,
+                    commissionTypeId: '-1',
+                    name: '',
+                    commissionRate: ''
                 };
 
 
                 var data = {
-
+                    "condition": {
+                        "logicType": "and",
+                        "condItems": [
+                            {
+                                "fieldName": "goodsId",
+                                "opType": "equal",
+                                "value": $scope.goodsId
+                            }
+                        ]
+                    }
                 };
 
-                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/getList', data, CommonConfig.httpReqConfig)
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/goods/getListByGoodsId?goodsId=' + $scope.goodsId)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
@@ -208,7 +222,7 @@
             };
 
             $scope.getDetailData = function (id) {
-                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/getbyid?id=' + id)
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/goods/getbyid?id=' + id)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.detailInfo = result.data.data[0];
                         $scope.isAdd = false;
@@ -271,7 +285,7 @@
             $scope.saveData = function () {
                 if ($scope.isAdd) {//新增
 
-                    $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/add', $scope.detailInfo, CommonConfig.httpReqConfig)
+                    $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/goods/add', $scope.detailInfo, CommonConfig.httpReqConfig)
                         .then(function (result) {  //正确请求成功时处理
                             console.log('saveData:result', result);
 
@@ -290,7 +304,7 @@
                         });
                 }
                 else {//修改
-                    $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/modify', $scope.detailInfo, CommonConfig.httpReqConfig)
+                    $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/goods/modify', $scope.detailInfo, CommonConfig.httpReqConfig)
                         .then(function (result) {  //正确请求成功时处理
                             if (result.data.code != 'NONE_ERROR') {
                                 AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
@@ -306,6 +320,10 @@
                             console.log(result);
                         });
                 }
+            };
+
+            $scope.back2GoodsList = function () {
+                window.location = '../Goods/GoodsList.html';
             };
 
 
