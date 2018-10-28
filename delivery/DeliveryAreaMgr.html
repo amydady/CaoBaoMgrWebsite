@@ -96,7 +96,7 @@
                         <div class="form-group row">
                             <label for="inputName" class="col-sm-1 col-form-label">名称</label>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control" id="inputRate" ng-model="cityMgrInfo.name"
+                                <input type="text" class="form-control" id="inputRate" ng-model="cityMgrInfo.detailInfo.name"
                                     readonly>
                             </div>
                             <div class="col-sm-6" id='cityMgrAlertInfo'>
@@ -106,7 +106,7 @@
                         <div class="form-group row">
                             <label for="inputName" class="col-sm-1 col-form-label">省份</label>
                             <div class="col-sm-4">
-                                <select class="form-control" ng-change="onProvinceChanged($index)" ng-model="cityMgrInfo.province">
+                                <select class="form-control" ng-change="onProvinceChanged($index)" ng-model="cityMgrInfo.detailInfo.province">
                                     <option value="-1" ng-selected>请选择...</option>
                                     <option ng-repeat="x in provinceListData" value="{{x.name}}">{{x.name}}</option>
                                 </select>
@@ -114,7 +114,7 @@
 
                             <label for="inputName" class="col-sm-1 col-form-label">城市</label>
                             <div class="col-sm-4">
-                                <select class="form-control" ng-model="cityMgrInfo.city">
+                                <select class="form-control" ng-model="cityMgrInfo.detailInfo.city">
                                     <option value="-1" ng-selected>请选择...</option>
                                     <option ng-repeat="x in cityListData" value="{{x.name}}">{{x.name}}</option>
                                 </select>
@@ -151,7 +151,6 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">关 闭</button>
-                    <button type="button" class="btn btn-primary">保 存</button>
                 </div>
             </div>
 
@@ -174,15 +173,7 @@
 
         app.controller('myCtrl', function ($scope, $http) {
 
-            $scope.cityMgrInfo = {
-                province: '-1',
-                city: '-1',
-                detailInfo: {
-                    id: '',
-                    cityInfo: '',
-                    cityListData: []
-                }
-            };
+
 
 
             $scope.getProvinceData = function () {
@@ -213,8 +204,9 @@
 
             //省份变更事件
             $scope.onProvinceChanged = function () {
-                $scope.getCityData($scope.cityMgrInfo.province);
-                $scope.cityMgrInfo.city = '-1';
+                $scope.getCityData($scope.cityMgrInfo.detailInfo.province);
+
+                $scope.cityMgrInfo.detailInfo.city = '-1';
             };
 
 
@@ -243,25 +235,44 @@
             };
 
             $scope.cityMgr = function (id) {
+                $scope.cityMgrInfo = {
+                    detailInfo: {
+                        id: id,
+                        name: '',
+                        cityInfo: '',
+                        cityListData: [],
+                        province: '-1',//下拉框中当前选择的province
+                        city: '-1',//下拉框中当前选择的city
+                    }
+                };
 
-                $scope.cityMgrInfo.detailInfo.id = id;
+                $scope.cityListData = [];
 
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/getbyid?id=' + id)
                     .then(function (result) {  //正确请求成功时处理
-                        $scope.cityMgrInfo.detailInfo = result.data.data[0];
-                        console.log("$scope.cityMgr:", result);
+                        var data = result.data.data[0];
+                        $scope.cityMgrInfo.detailInfo.name = data.name;
+                        $scope.cityMgrInfo.detailInfo.cityInfo = data.cityInfo;
+
+                        // console.log("$scope.cityMgr:", result);
+
+                        // province:city,province:city...
+                        var cityInfo = $scope.cityMgrInfo.detailInfo.cityInfo;
+                        $scope.cityMgrInfo.detailInfo.cityListData = []
+                        if (StringUtil.isNotEmpty(cityInfo)) {
+                            cityList = cityInfo.split(',');
+                            for (var i = 0; i < cityList.length; i++) {
+                                $scope.cityMgrInfo.detailInfo.cityListData.push({ province: cityList[i].split(':')[0], city: cityList[i].split(':')[1], index: i, delete: 'N' });
+                            }
+                        }
+
+                        $('#myModal').modal('show');
+
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
 
-                // province:city,province:city...
-                var cityInfo = $scope.cityMgrInfo.detailInfo.cityInfo;
-                cityList = cityInfo.split(',');
-                for (var i = 0; i < cityList.length; i++) {
-                    $scope.cityMgrInfo.detailInfo.cityListData.push({ province: cityList[i].split(':')[0], city: cityList[i].split(':')[1], index: i, delete: 'N' });
-                }
 
-                $('#myModal').modal('show');
             };
 
             $scope.onSelectAllOrCancel = function () {
@@ -300,7 +311,7 @@
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/batchdisable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/batchdisable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -321,7 +332,7 @@
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/batchenable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/batchenable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -372,31 +383,41 @@
             };
 
             $scope.onAddCity = function () {
-                if ($scope.cityMgrInfo.city == '-1') {
+                if ($scope.cityMgrInfo.detailInfo.city == '-1') {
                     AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '请选择城市！', AlertUtil.defaultTimeout);
                     return;
                 }
 
                 var cityInfo = $scope.cityMgrInfo.detailInfo.cityInfo;
                 if (StringUtil.isNotEmpty(cityInfo)) {
+                    //检测该城市是否已经存在
+                    if (cityInfo.indexOf($scope.cityMgrInfo.detailInfo.province + ':' + $scope.cityMgrInfo.detailInfo.city) != -1) {
+                        AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '已包含该城市', AlertUtil.defaultTimeout);
+                        return;
+                    }
+
                     cityInfo += ',';
                 }
+                else {
+                    cityInfo = '';
+                }
 
-                cityInfo += $scope.cityMgrInfo.province + ':' + $scope.cityMgrInfo.city;
+                cityInfo += $scope.cityMgrInfo.detailInfo.province + ':' + $scope.cityMgrInfo.detailInfo.city;
+
+                $scope.cityMgrInfo.detailInfo.cityInfo = cityInfo;
 
                 $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/modify', $scope.cityMgrInfo.detailInfo, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         if (result.data.code != 'NONE_ERROR') {
-                            AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                            AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '修改失败！', AlertUtil.defaultTimeout);
                             return;
                         }
 
-                        AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
+                        AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '修改成功！', AlertUtil.defaultTimeout);
 
-                        $scope.getData();
-                        console.log(result);
+                        $scope.cityMgr($scope.cityMgrInfo.detailInfo.id);
                     }).catch(function (result) { //捕捉错误处理
-                        AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                        AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '修改失败！', AlertUtil.defaultTimeout);
                         console.log(result);
                     });
 
@@ -405,9 +426,9 @@
             // 删除一条城市信息
             $scope.deleteCity = function (index) {
                 var cityListData = $scope.cityMgrInfo.detailInfo.cityListData;
-                cityListData[i].delete = 'Y';
+                cityListData[index].delete = 'Y';
 
-                var cityInfo = $scope.cityMgrInfo.detailInfo.cityInfo = '';
+                var cityInfo = '';
 
                 for (var i = 0; i < cityListData.length; i++) {
                     if (cityListData[i].delete != 'Y') {
@@ -419,27 +440,23 @@
                 }
 
                 if (cityInfo.endsWith(',')) {
-                    cityInfo.substr(0, cityInfo.length - 1)
+                    cityInfo = cityInfo.substr(0, cityInfo.length - 1)
                 }
+
+                $scope.cityMgrInfo.detailInfo.cityInfo = cityInfo;
 
                 $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/modify', $scope.cityMgrInfo.detailInfo, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         if (result.data.code != 'NONE_ERROR') {
-                            AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                            AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '修改失败！', AlertUtil.defaultTimeout);
                             return;
                         }
 
-                        AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
-                        console.log(result);
+                        $scope.cityMgr($scope.cityMgrInfo.detailInfo.id);
                     }).catch(function (result) { //捕捉错误处理
-                        AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                        AlertUtil.dangerWithCloseButton('cityMgrAlertInfo', '修改失败！', AlertUtil.defaultTimeout);
                         console.log(result);
                     });
-
-                $scope.cityMgr($scope.cityMgrInfo.detailInfo.id);
-
-
-
             };
 
 
