@@ -56,6 +56,7 @@
                             <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
                             <th scope="col" ng-hide={{true}}>ID</th>
                             <th scope="col">名 称</th>
+                            <th scope="col">覆盖城市</th>
                             <th scope="col">创建时间</th>
                             <th scope="col">是否有效</th>
                             <th scope="col"> </th>
@@ -66,6 +67,7 @@
                             <td><input type="checkbox"></td>
                             <td ng-hide={{true}}>{{x.id}}</td>
                             <th scope="row"><a href="#" ng-click="getDetailData(x.id)">{{x.name}}</a></td>
+                            <td>{{x.cityInfo}}</td>
                             <td>{{x.createTime}}</td>
                             <td>{{x.enable=='Y'?'是':'否'}}</td>
                             <td>
@@ -174,7 +176,10 @@
         app.controller('myCtrl', function ($scope, $http) {
 
 
-
+            // 城市维护窗口关闭事件
+            $('#myModal').on('hidden.bs.modal', function (e) {
+                $scope.getData();
+            });
 
             $scope.getProvinceData = function () {
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'basicinfo/provinces')
