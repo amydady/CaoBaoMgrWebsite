@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+    <title>DeliveryFeeRuleMgr</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <div class="container-fluid">
+        <!-- 页面标题 -->
+        <div class="row" style="height:60px">
+            <div class="col">
+                <h4>物流费用设置</h4>
+            </div>
+            <div class="col-10" id='alertInfo'>
+
+            </div>
+        </div>
+
+        <form>
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-1 col-form-label">名 称</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="inputName" placeholder="佣金类目名称" ng-model="detailInfo.name">
+                </div>
+
+                <div class="col-sm-1">
+                    <button class="btn btn-success" ng-click="saveData()">{{isAdd?'添 加':'修 改'}}</button>
+                </div>
+            </div>
+
+        </form>
+        <hr />
+
+
+        <!-- 操作按钮 -->
+        <div class="row">
+            <div class="col" align="right">
+                <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
+                <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
+            </div>
+        </div>
+        <hr />
+        <!-- 数据区域 -->
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover" id="table">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+                            <th scope="col" ng-hide={{true}}>ID</th>
+                            <th scope="col">名 称</th>
+                            <th scope="col">创建时间</th>
+                            <th scope="col">是否有效</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in listData">
+                            <td><input type="checkbox"></td>
+                            <td ng-hide={{true}}>{{x.id}}</td>
+                            <th scope="row"><a href="#" ng-click="getDetailData(x.id)">{{x.name}}</a></td>
+                            <td>{{x.createTime}}</td>
+                            <td>{{x.enable=='Y'?'是':'否'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../lib/jquery/jquery.3.2.1.js"></script>
+    <script src="../lib/popper/popper.1.12.9.js"></script>
+    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/angular-1.7.5/angular.min.js"></script>
+    <script src="../common/littleCatCommon.js"></script>
+
+    <script>
+        var app = angular.module('myApp', []);
+
+        app.controller('myCtrl', function ($scope, $http) {
+            $scope.getData = function () {
+
+                $scope.isAdd = true;
+                $scope.detailInfo = {
+                    id: '',
+                    name: ''
+                };
+
+
+                var data = {
+
+                };
+
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/getList', data, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.listData = result.data.data
+
+                        console.log(result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                        alert(result.data.Message);
+                    });
+
+
+            };
+
+            $scope.onSelectAllOrCancel = function () {
+                TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.listData.length);
+                $scope.selectAll = !$scope.selectAll;
+            };
+
+            $scope.getDetailData = function (id) {
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/getbyid?id=' + id)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.detailInfo = result.data.data[0];
+                        $scope.isAdd = false;
+
+                        console.log(result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                        alert(result.data.Message);
+                    });
+            };
+
+            //重置记录的选择状态
+            $scope.resetSelectStatus = function () {
+                document.getElementById('cbxSelectAllOrCancel').checked = false;
+                $scope.selectAll = false;
+            }
+
+            //置失效
+            $scope.onDisable = function () {
+                $scope.resetSelectStatus();
+                AlertUtil.clearAlert('alertInfo');
+
+                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
+
+                if (ids == null || ids.length == 0) {
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
+                    return;
+                }
+
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/batchdisable', ids, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log(result);
+                        $scope.getData();
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+            //置生效
+            $scope.onEnable = function () {
+                $scope.resetSelectStatus();
+                AlertUtil.clearAlert('alertInfo');
+
+                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
+
+                if (ids == null || ids.length == 0) {
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
+                    return;
+                }
+
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/batchenable', ids, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log(result);
+                        $scope.getData();
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+            $scope.saveData = function () {
+                if ($scope.isAdd) {//新增
+
+                    $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/add', $scope.detailInfo, CommonConfig.httpReqConfig)
+                        .then(function (result) {  //正确请求成功时处理
+                            console.log('saveData:result', result);
+
+                            if (result.data.code != 'NONE_ERROR') {
+                                AlertUtil.dangerWithCloseButton('alertInfo', '添加失败！', AlertUtil.defaultTimeout);
+                                return;
+                            }
+
+                            AlertUtil.successWithCloseButton('alertInfo', '添加成功！', AlertUtil.defaultTimeout);
+
+                            $scope.getData();
+
+                        }).catch(function (result) { //捕捉错误处理
+                            AlertUtil.dangerWithCloseButton('alertInfo', '添加失败！', AlertUtil.defaultTimeout);
+                            console.log(result);
+                        });
+                }
+                else {//修改
+                    $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/modify', $scope.detailInfo, CommonConfig.httpReqConfig)
+                        .then(function (result) {  //正确请求成功时处理
+                            if (result.data.code != 'NONE_ERROR') {
+                                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                                return;
+                            }
+
+                            AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
+
+                            $scope.getData();
+                            console.log(result);
+                        }).catch(function (result) { //捕捉错误处理
+                            AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+                            console.log(result);
+                        });
+                }
+            };
+
+
+            //页面初始化
+            $scope.selectAll = false;
+            $scope.getData();
+        });
+    </script>
+
+</body>
+
+</html>
