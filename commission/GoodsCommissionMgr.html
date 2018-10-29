@@ -33,16 +33,16 @@
 
         <form>
             <div class="form-group row">
-                <label for="inputName" class="col-sm-1 col-form-label">佣金类目</label>
-                <div class="col-sm-2">
+                <label for="inputName" class="col-sm-2 col-form-label">佣金类目</label>
+                <div class="col-sm-3">
                     <select class="form-control" ng-model="detailInfo.commissionTypeId">
                         <option value="-1" ng-selected>请选择...</option>
                         <option ng-repeat="x in commissionTypeListData" value="{{x.id}}">{{x.name}}</option>
                     </select>
                 </div>
 
-                <label for="inputName" class="col-sm-1 col-form-label">佣金比例</label>
-                <div class="col-sm-2">
+                <label for="inputName" class="col-sm-2 col-form-label">佣金比例</label>
+                <div class="col-sm-3">
                     <input type="text" class="form-control" id="inputRate" placeholder="数字,最多一位小数（如99.9）" ng-model="detailInfo.commissionRate">
                 </div>
 

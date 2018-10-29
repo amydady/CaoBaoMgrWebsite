@@ -255,7 +255,9 @@
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/feerule/getbyid?id=' + id)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.detailInfo = result.data.data[0];
+                        $scope.detailInfo.enableV = $scope.detailInfo.enable == 'Y' ? '是' : '否';
                         $scope.isAdd = false;
+                        $('#myModal').modal('show');
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
