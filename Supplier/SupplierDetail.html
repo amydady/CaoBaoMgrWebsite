@@ -22,34 +22,34 @@
       </div>
 
       <div class="col-10" id='alertInfo'>
-        
+
       </div>
     </div>
 
     <form>
       <div class="form-group row">
-        <label for="inputName" class="col-sm-1 col-form-label">名称</label>
-        <div class="col-sm-11">
-          <input type="text" class="form-control" id="inputName" placeholder="供应商名称" ng-model="supplierInfo.name">
+        <label for="inputName" class="col-sm-2 col-form-label">名称<b><span style="color:red"> *</span></b></label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="inputName" placeholder="供应商名称" required ng-model="supplierInfo.name">
         </div>
       </div>
       <div class="form-group row">
-        <label for="inputRemark" class="col-sm-1 col-form-label">备注</label>
-        <div class="col-sm-11">
+        <label for="inputRemark" class="col-sm-2 col-form-label">备注</label>
+        <div class="col-sm-10">
           <input type="text" class="form-control" id="inputRemark" placeholder="供应商备注信息" ng-model="supplierInfo.remark">
         </div>
       </div>
 
       <div class="form-group row" ng-hide="isAdd">
-        <label for="inputCreateTime" class="col-sm-1 col-form-label">创建时间</label>
-        <div class="col-sm-11">
+        <label for="inputCreateTime" class="col-sm-2 col-form-label">创建时间</label>
+        <div class="col-sm-10">
           <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="supplierInfo.createTime">
         </div>
       </div>
 
       <div class="form-group row" ng-hide="isAdd">
-        <label for="inputEnable" class="col-sm-1 col-form-label">是否有效</label>
-        <div class="col-sm-11">
+        <label for="inputEnable" class="col-sm-2 col-form-label">是否有效</label>
+        <div class="col-sm-10">
           <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="supplierInfo.enableV">
         </div>
       </div>
@@ -110,15 +110,9 @@
 
 
       $scope.saveData = function () {
-        console.log($scope.supplierInfo.id);
-
         if ($scope.isAdd) {//新增
-          var data = {
-            "name": $scope.supplierInfo.name,
-            "remark": $scope.supplierInfo.remark
-          }
 
-          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', data, CommonConfig.httpReqConfig)
+          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', $scope.supplierInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
               window.location = 'SupplierList.html'
             }).catch(function (result) { //捕捉错误处理
@@ -126,20 +120,12 @@
             });
         }
         else {//修改
-          var data = {
-            "id": $scope.supplierInfo.id,
-            "name": $scope.supplierInfo.name,
-            "remark": $scope.supplierInfo.remark,
-            "enable": $scope.supplierInfo.enable
-          }
 
-          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/modify', data, CommonConfig.httpReqConfig)
+          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/modify', $scope.supplierInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              AlertUtil.successWithCloseButton('alertInfo','修改成功！',AlertUtil.defaultTimeout);
-
-              console.log(result);
+              AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
             }).catch(function (result) { //捕捉错误处理
-              AlertUtil.dangerWithCloseButton('alertInfo','修改失败！',AlertUtil.defaultTimeout);
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
               console.log(result);
             });
         }
