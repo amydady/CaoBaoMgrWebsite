@@ -28,10 +28,10 @@
             <div class="col-3">
                 <h5>商品：{{goodsName}}</h5>
             </div>
-            <div class="col-3">
+            <div class="col-4">
                 <h5>计划开始：{{planStartTime}}</h5>
             </div>
-            <div class="col-3">
+            <div class="col-4">
                 <h5>计划结束：{{planEndTime}}</h5>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="form-group row">
                 <label for="inputName" class="col-sm-2 col-form-label">调整数量</label>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" id="inputName" placeholder="调增填正数，调减填负数" ng-model="detailInfo.changeValue">
+                    <input type="text" class="form-control" id="inputChangeValue" placeholder="调增填正数，调减填负数" ng-model="detailInfo.changeValue">
                 </div>
                 <label for="inputRemark" class="col-sm-2 col-form-label">调整描述</label>
                 <div class="col-sm-3">
@@ -50,7 +50,7 @@
 
                 <div class="col-sm-2">
                     <button class="btn btn-success" ng-click="saveData()">确 定</button>
-                    <button class="btn btn-success" ng-click="back2PlanList()">返回秒杀计划</button>
+                    <button class="btn btn-success" ng-click="back2PlanList()">返 回</button>
                 </div>
             </div>
 

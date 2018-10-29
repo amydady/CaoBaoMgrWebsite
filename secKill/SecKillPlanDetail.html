@@ -67,7 +67,7 @@
     </div>
 
     <div class="form-group row">
-      <label for="selectDeliveryArea" class="col-sm-2 col-form-label">发货区域</label>
+      <label for="selectDeliveryArea" class="col-sm-2 col-form-label">配送区域</label>
       <div class="col-sm-4">
         <select class="form-control" ng-model="detailInfo.deliveryAreaId">
           <option value="-1">请选择...</option>
@@ -155,6 +155,42 @@
         window.location = '../Goods/GoodsList.html';
       });
 
+      $scope.getDeliveryAreaListData = function () {
+        var data = {
+          "condition": {
+            "logicType": "and",
+            "condItems": [
+              {
+                "fieldName": "enable",
+                "opType": "equal",
+                "value": "Y"
+              }
+            ]
+          },
+          "sortFields": "name",
+          "sortType": "asc"
+        };
+
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/getList', data, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            $scope.deliveryAreaListData = result.data.data;
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.getDeliveryFeeRuleListData = function () {
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/feerule/getList')
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.deliveryFeeRuleListData = result.data.data
+                        console.log('getData:', result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+      };
+
+
+
 
       $scope.getGoodsSummayInfoById = function (goodsId) {
         $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getSummayInfoById?id=' + goodsId)
@@ -191,6 +227,9 @@
 
       // 初始化
       $scope.init = function () {
+        $scope.getDeliveryAreaListData();
+        $scope.getDeliveryFeeRuleListData();
+
         if (StringUtil.isNotEmpty($scope.detailInfo.id)) {
           //是否为新增
           $scope.isAdd = false;

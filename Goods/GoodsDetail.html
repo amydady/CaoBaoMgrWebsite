@@ -264,6 +264,41 @@
           });
       };
 
+      $scope.getDeliveryAreaListData = function () {
+        var data = {
+          "condition": {
+            "logicType": "and",
+            "condItems": [
+              {
+                "fieldName": "enable",
+                "opType": "equal",
+                "value": "Y"
+              }
+            ]
+          },
+          "sortFields": "name",
+          "sortType": "asc"
+        };
+
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/getList', data, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            $scope.deliveryAreaListData = result.data.data;
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.getDeliveryFeeRuleListData = function () {
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/feerule/getList')
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.deliveryFeeRuleListData = result.data.data
+                        console.log('getData:', result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+      };
+
+
       // 根据产品ID获取产品明细信息
       $scope.getGoodsDetailInfoById = function (id) {
         $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getbyid?id=' + id)
@@ -283,6 +318,8 @@
       // 初始化
       $scope.init = function () {
         $scope.getSupplierListData();
+        $scope.getDeliveryAreaListData();
+        $scope.getDeliveryFeeRuleListData();
 
         if (StringUtil.isNotEmpty($scope.goodsDetailInfo.id)) {
           //是否为新增

@@ -252,7 +252,7 @@
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/batchdisable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/goods/batchdisable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -273,7 +273,7 @@
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/batchenable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/goods/batchenable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();

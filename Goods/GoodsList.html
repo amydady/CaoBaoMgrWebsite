@@ -136,7 +136,7 @@
                 $scope.resetSelectStatus();
                 AlertUtil.clearAlert('alertInfo');
 
-                var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.listData.length);
+                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
@@ -157,7 +157,7 @@
                 $scope.resetSelectStatus();
                 AlertUtil.clearAlert('alertInfo');
 
-                var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.listData.length);
+                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
