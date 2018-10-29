@@ -24,25 +24,11 @@
             </div>
         </div>
 
-        <form>
-            <div class="form-group row">
-                <label for="inputName" class="col-sm-1 col-form-label">名 称</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" id="inputName" placeholder="佣金类目名称" ng-model="detailInfo.name">
-                </div>
-
-                <div class="col-sm-1">
-                    <button class="btn btn-success" ng-click="saveData()">{{isAdd?'添 加':'修 改'}}</button>
-                </div>
-            </div>
-
-        </form>
-        <hr />
-
 
         <!-- 操作按钮 -->
         <div class="row">
             <div class="col" align="right">
+                <button type="button" class="btn btn-success" ng-click='onAdd()'>添 加</button>
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
                 <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
             </div>
@@ -57,6 +43,11 @@
                             <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
                             <th scope="col" ng-hide={{true}}>ID</th>
                             <th scope="col">名 称</th>
+                            <th scope="col">配送区域</th>
+                            <th scope="col">计费方式</th>
+                            <th scope="col">区间开始</th>
+                            <th scope="col">区间结束</th>
+                            <th scope="col">费用</th>
                             <th scope="col">创建时间</th>
                             <th scope="col">是否有效</th>
                         </tr>
@@ -65,7 +56,12 @@
                         <tr ng-repeat="x in listData">
                             <td><input type="checkbox"></td>
                             <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="#" ng-click="getDetailData(x.id)">{{x.name}}</a></td>
+                            <th scope="row"><a href="#" ng-click="onLoadDetail(x.id)">{{x.name}}</a></th>
+                            <td>{{x.deliveryAreaName}}</td>
+                            <td>{{x.calcTypeName}}</td>
+                            <td>{{x.beginValue}}</td>
+                            <td>{{x.endValue}}</td>
+                            <td>{{x.fee}}</td>
                             <td>{{x.createTime}}</td>
                             <td>{{x.enable=='Y'?'是':'否'}}</td>
                         </tr>
@@ -74,6 +70,62 @@
             </div>
         </div>
 
+    </div>
+
+    <div id='myModal' class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">配送区域编辑</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-1 col-form-label">名称</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="inputRate" ng-model="cityMgrInfo.detailInfo.name"
+                                    readonly>
+                            </div>
+                            <div class="col-sm-6" id='cityMgrAlertInfo'>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-1 col-form-label">省份</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" ng-change="onProvinceChanged($index)" ng-model="cityMgrInfo.detailInfo.province">
+                                    <option value="-1" ng-selected>请选择...</option>
+                                    <option ng-repeat="x in provinceListData" value="{{x.name}}">{{x.name}}</option>
+                                </select>
+                            </div>
+
+                            <label for="inputName" class="col-sm-1 col-form-label">城市</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" ng-model="cityMgrInfo.detailInfo.city">
+                                    <option value="-1" ng-selected>请选择...</option>
+                                    <option ng-repeat="x in cityListData" value="{{x.name}}">{{x.name}}</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-1.5"><button type="button" class="btn btn-success" ng-click='onAddCity()'>添加城市</button></div>
+                        </div>
+
+                    </form>
+
+                    <hr />
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关 闭</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 
 
@@ -89,6 +141,11 @@
         var app = angular.module('myApp', []);
 
         app.controller('myCtrl', function ($scope, $http) {
+
+            $('#myModal').on('hidden.bs.modal', function (e) {
+                $scope.getData();
+            });
+
             $scope.getData = function () {
 
                 $scope.isAdd = true;
@@ -137,6 +194,10 @@
             $scope.resetSelectStatus = function () {
                 document.getElementById('cbxSelectAllOrCancel').checked = false;
                 $scope.selectAll = false;
+            }
+
+            $scope.onAdd = function () {
+                $('#myModal').modal('show');
             }
 
             //置失效
