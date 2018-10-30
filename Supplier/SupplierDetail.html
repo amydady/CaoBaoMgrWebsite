@@ -28,9 +28,10 @@
 
     <form>
       <div class="form-group row">
-        <label for="inputName" class="col-sm-2 col-form-label">名称<b><span style="color:red"> *</span></b></label>
+        <label for="inputName" class="col-sm-2 col-form-label">名称</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="inputName" placeholder="供应商名称" required ng-model="supplierInfo.name">
+          <input type="text" class="form-control" id="inputName" placeholder="供应商名称" ng-change='onInputNameChanged();'
+            ng-model="supplierInfo.name">
         </div>
       </div>
       <div class="form-group row">
@@ -53,7 +54,7 @@
           <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="supplierInfo.enableV">
         </div>
       </div>
-      
+
       <div class="form-group row">
         <div class="col-sm-11">
           <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'添 加':'修 改'}}</button>
@@ -76,13 +77,33 @@
   <script>
     var app = angular.module('myApp', []);
 
-    CommonConfig.configApp(app);
-
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
       $scope.supplierInfo = {
         id: RequestUtil.getQueryParamByName('id')
       };
 
+      //表单验证
+      $scope.formValid = function () {
+        var validResult = true;
+
+        var inputName = $('#inputName');
+        if (StringUtil.isEmpty($scope.supplierInfo.name)) {
+          inputName.addClass('is-invalid');
+          inputName.focus();
+          validResult = false;
+        }
+        else {
+          inputName.removeClass('is-invalid');
+        }
+
+        return validResult;
+      };
+
+      $scope.onInputNameChanged = function () {
+        $scope.formValid();
+      };
+
+      
       if (StringUtil.isNotEmpty($scope.supplierInfo.id)) {
         //是否为新增
         $scope.isAdd = false;
@@ -96,13 +117,18 @@
           });
       } else {
         $scope.isAdd = true;
+        $scope.formValid();
       }
-
+      
       $scope.back2List = function () {
         window.location = 'SupplierList.html';
       };
 
       $scope.saveData = function () {
+        if (!$scope.formValid()) {
+          return;
+        }
+
         if ($scope.isAdd) {//新增
 
           $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', $scope.supplierInfo, CommonConfig.httpReqConfig)
