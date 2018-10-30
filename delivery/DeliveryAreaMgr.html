@@ -24,23 +24,16 @@
             </div>
         </div>
 
-        <form>
-            <div class="form-group row">
-                <label for="inputName" class="col-sm-1 col-form-label">名 称</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" id="inputDeliveryAreaName" placeholder="配送区域名称" ng-model="detailInfo.name">
-                </div>
-                <div class="col-sm-1">
-                    <button class="btn btn-success" ng-click="onSaveName()">{{isAdd?'添 加':'修 改'}}</button>
-                </div>
-            </div>
-
-        </form>
-        <hr />
-
-
         <!-- 操作按钮 -->
         <div class="row">
+            <label for="inputDeliveryAreaName" class="col-sm-1 col-form-label">名 称</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="inputDeliveryAreaName" ng-change='onInputDeliveryAreaNameChanged();' placeholder="配送区域名称" ng-model="detailInfo.name">
+            </div>
+            <div class="col-sm-1">
+                <button class="btn btn-success" ng-click="onSaveName()">{{isAdd?'添 加':'修 改'}}</button>
+            </div>
+
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
                 <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
@@ -214,8 +207,31 @@
                 $scope.cityMgrInfo.detailInfo.city = '-1';
             };
 
+            //表单验证
+            $scope.formValid = function () {
+                var validResult = true;
+
+                var inputDeliveryAreaName = $('#inputDeliveryAreaName');
+                if (StringUtil.isEmpty($scope.detailInfo.name)) {
+                    inputDeliveryAreaName.addClass('is-invalid');
+                    inputDeliveryAreaName.focus();
+                    validResult = false;
+                }
+                else {
+                    $('#inputDeliveryAreaName').removeClass('is-invalid');
+                }
+
+                return validResult;
+            };
+
+            $scope.onInputDeliveryAreaNameChanged = function(){
+                $scope.formValid();
+            };
+
 
             $scope.getData = function () {
+
+
 
                 $scope.isAdd = true;
                 $scope.detailInfo = {
@@ -348,6 +364,11 @@
 
 
             $scope.onSaveName = function () {
+
+                if (!$scope.formValid()) {
+                    return;
+                }
+
                 if ($scope.isAdd) {//新增
 
                     $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/area/add', $scope.detailInfo, CommonConfig.httpReqConfig)
@@ -469,6 +490,7 @@
             $scope.selectAll = false;
             $scope.getProvinceData();
             $scope.getData();
+            $scope.formValid();
         });
 
     </script>

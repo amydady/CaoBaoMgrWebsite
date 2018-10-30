@@ -24,24 +24,17 @@
             </div>
         </div>
 
-        <form>
-            <div class="form-group row">
-                <label for="inputName" class="col-sm-1 col-form-label">名 称</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" id="inputName" placeholder="佣金类目名称" ng-model="detailInfo.name">
-                </div>
-
-                <div class="col-sm-1">
-                    <button class="btn btn-success" ng-click="saveData()">{{isAdd?'添 加':'修 改'}}</button>
-                </div>
-            </div>
-
-        </form>
-        <hr />
-
-
         <!-- 操作按钮 -->
         <div class="row">
+            <label for="inputName" class="col-sm-1 col-form-label">名 称</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="inputName" placeholder="佣金类目名称" ng-change='onInputNameChanged();' ng-model="detailInfo.name">
+            </div>
+
+            <div class="col-sm-1">
+                <button class="btn btn-success" ng-click="saveData()">{{isAdd?'添 加':'修 改'}}</button>
+            </div>
+
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
                 <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
@@ -181,7 +174,32 @@
                     });
             };
 
+            //表单验证
+            $scope.formValid = function () {
+                var validResult = true;
+
+                var inputName = $('#inputName');
+                if (StringUtil.isEmpty($scope.detailInfo.name)) {
+                    inputName.addClass('is-invalid');
+                    inputName.focus();
+                    validResult = false;
+                }
+                else {
+                    $('#inputName').removeClass('is-invalid');
+                }
+
+                return validResult;
+            };
+
+            $scope.onInputNameChanged = function(){
+                $scope.formValid();
+            };
+
             $scope.saveData = function () {
+                if (!$scope.formValid()) {
+                    return;
+                }
+                
                 if ($scope.isAdd) {//新增
 
                     $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/type/add', $scope.detailInfo, CommonConfig.httpReqConfig)
@@ -225,6 +243,7 @@
             //页面初始化
             $scope.selectAll = false;
             $scope.getData();
+            $scope.formValid();
         });
     </script>
 

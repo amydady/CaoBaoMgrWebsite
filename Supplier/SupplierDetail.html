@@ -53,11 +53,11 @@
           <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="supplierInfo.enableV">
         </div>
       </div>
-
-
+      
       <div class="form-group row">
         <div class="col-sm-11">
-          <button type="submit" class="btn btn-primary" ng-click="saveData()">{{saveBtnTitle}}</button>
+          <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'添 加':'修 改'}}</button>
+          <button type="button" class="btn btn-secondary" ng-click="back2List()">返 回</button>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
       $scope.supplierInfo = {
-        id: $location.search().id
+        id: RequestUtil.getQueryParamByName('id')
       };
 
       if (StringUtil.isNotEmpty($scope.supplierInfo.id)) {
@@ -89,25 +89,18 @@
 
         $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/getbyid?id=' + $scope.supplierInfo.id)
           .then(function (result) {  //正确请求成功时处理
-
-            $scope.supplierInfo.name = result.data.data[0].name;
-            $scope.supplierInfo.remark = result.data.data[0].remark;
-            $scope.supplierInfo.createTime = result.data.data[0].createTime;
-            $scope.supplierInfo.enable = result.data.data[0].enable;
+            $scope.supplierInfo = result.data.data[0];
             $scope.supplierInfo.enableV = $scope.supplierInfo.enable == 'Y' ? '是' : '否';
-
-            console.log(result);
-
           }).catch(function (result) { //捕捉错误处理
             console.log(result);
           });
-
-        $scope.saveBtnTitle = '修 改';
       } else {
         $scope.isAdd = true;
-        $scope.saveBtnTitle = '添 加';
       }
 
+      $scope.back2List = function () {
+        window.location = 'SupplierList.html';
+      };
 
       $scope.saveData = function () {
         if ($scope.isAdd) {//新增

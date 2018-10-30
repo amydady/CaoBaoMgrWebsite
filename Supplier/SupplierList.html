@@ -14,6 +14,8 @@
 
 <body ng-app="myApp" ng-controller="myCtrl">
     <div class="container-fluid">
+
+
         <!-- 页面标题 -->
         <div class="row" style="height:60px">
             <div class="col">
@@ -24,15 +26,26 @@
             </div>
         </div>
 
+
         <!-- 操作按钮 -->
         <div class="row">
+            <div class="col-3">
+                <div class="input-group">
+                    <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="名称" ng-keyup="enterEvent($event)"
+                        ng-model="search.name">
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-outline-success" ng-click="onSearch()">查 询</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
-                <button type="button" class="btn btn-success" ng-click='onDisable()'>失 效</button>
+                <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
             </div>
         </div>
-
+        <hr />
         <!-- 数据区域 -->
         <div class="row">
             <div class="col">
@@ -78,13 +91,19 @@
         var app = angular.module('myApp', []);
 
         app.controller('myCtrl', function ($scope, $http) {
+            $scope.search = {
+                name: ''
+            };
+
             $scope.getData = function () {
                 var data = {
                     "condition": {
                         "logicType": "and",
                         "condItems": [
                             {
-
+                                "fieldName": "name",
+                                "opType": "like",
+                                "value": $scope.search.name
                             }
                         ]
                     },
@@ -115,6 +134,10 @@
                 window.location = "SupplierDetail.html";
             };
 
+            $scope.onSearch = function () {
+                $scope.getData();
+            };
+
             //重置记录的选择状态
             $scope.resetSelectStatus = function () {
                 document.getElementById('cbxSelectAllOrCancel').checked = false;
@@ -129,7 +152,7 @@
                 var ids = TableUtil.getSelectedIds('tableSupplierList', 2, 1, $scope.supplierListData.length);
 
                 if (ids == null || ids.length == 0) {
-                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！',AlertUtil.defaultTimeout);
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
                     return;
                 }
 
@@ -150,7 +173,7 @@
                 var ids = TableUtil.getSelectedIds('tableSupplierList', 2, 1, $scope.supplierListData.length);
 
                 if (ids == null || ids.length == 0) {
-                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！',AlertUtil.defaultTimeout);
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
                     return;
                 }
 
@@ -163,6 +186,13 @@
                     });
 
 
+            };
+
+            $scope.enterEvent = function (e) {
+                var keycode = window.event ? e.keyCode : e.which;
+                if (keycode == 13) {
+                    $scope.onSearch();
+                }
             };
 
             //页面初始化
