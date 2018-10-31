@@ -17,188 +17,188 @@
 
   <div class="container-fluid">
 
-
     <!-- 页面标题 -->
     <div class="row" style="height:60px">
-      <div class="col-2">
+      <div class="col-md-3">
         <h4>商品详情</h4>
       </div>
 
-      <div class="col-10" id='alertInfo'>
+      <div class="col-md-9" id='alertInfo'>
 
       </div>
     </div>
 
-    <div class="row" style="height:60px">
-      <div class="col-12">
-        <h5>基本信息</h5>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+          aria-selected="true">基本信息</a>
+      </li>
+      <li class="nav-item" ng-hide="isAdd">
+        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+          aria-selected="false">主图信息</a>
+      </li>
+      <li class="nav-item" ng-hide="isAdd">
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact"
+          aria-selected="false">明细图片</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <br />
+        <form>
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-2 col-form-label">名称</label>
+            <div class="col-sm-4">
+              <input type="text" class="form-control" id="inputName" placeholder="名称" ng-model="goodsDetailInfo.name">
+            </div>
+            <label for="inputRemark" class="col-sm-2 col-form-label">概要信息</label>
+            <div class="col-sm-4">
+              <input type="text" class="form-control" id="inputRemark" placeholder="概要信息" ng-model="goodsDetailInfo.summaryDescription">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="selectSupplier" class="col-sm-2 col-form-label">供应商</label>
+            <div class="col-sm-4">
+              <select class="form-control" ng-model="goodsDetailInfo.supplierId">
+                <option value="-1" ng-selected>请选择...</option>
+                <option ng-repeat="x in supplierListData" value="{{x.id}}">{{x.name}}</option>
+              </select>
+            </div>
+            <label for="inputPrice" class="col-sm-2 col-form-label">价格</label>
+            <div class="col-sm-4">
+              <input type="text" class="form-control" id="inputPrice" placeholder="价格（单位为厘）" ng-model="goodsDetailInfo.price">
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label for="selectDeliveryArea" class="col-sm-2 col-form-label">发货区域</label>
+            <div class="col-sm-4">
+              <select class="form-control" ng-model="goodsDetailInfo.deliveryAreaId">
+                <option value="-1">请选择...</option>
+                <option ng-repeat="x in deliveryAreaListData" value="{{x.id}}">{{x.name}}</option>
+              </select>
+            </div>
+            <label for="selectDeliveryFeeRule" class="col-sm-2 col-form-label">运费规则</label>
+            <div class="col-sm-4">
+              <select class="form-control" ng-model="goodsDetailInfo.deliveryFeeRuleId">
+                <option value="-1">请选择...</option>
+                <option ng-repeat="x in deliveryFeeRuleListData" value="{{x.id}}">{{x.name}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div ng-hide="isAdd">
+            <div class="form-group row">
+              <label for="inputEnable" class="col-sm-2 col-form-label">创建人</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.createOperatorV">
+              </div>
+
+              <label for="inputCreateTime" class="col-sm-2 col-form-label">创建时间</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="goodsDetailInfo.createTime">
+              </div>
+
+            </div>
+
+            <div class="form-group row">
+
+              <label for="inputEnable" class="col-sm-2 col-form-label">是否有效</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.enableV">
+              </div>
+            </div>
+          </div>
+
+
+          <div class="form-group row">
+            <div class="col-sm-11">
+              <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
+              <button type="button" class="btn btn-secondary" ng-click="back2List()">返 回</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <br />
+        <div class="row">
+          <div class="col">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="fileMainImg">
+              <label class="custom-file-label" for="customFile">请选择产品主图...</label>
+            </div>
+          </div>
+          <button class="btn btn-primary" ng-click="saveMainImg()">确 定</button>
+        </div>
+        <br />
+        <div class="row">
+          <div class="col">
+            <img src="data:image/png;base64,{{goodsDetailInfo.mainImgData}}" width="500" height="300" alt="主图预览" />
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        <br />
+        <div class="row">
+          <label for="inputEnable" class="col-sm-1 col-form-label">标 题</label>
+          <div class="col-sm-2">
+            <input type="text" class="form-control" id="inputEnable" ng-model="detailImage.title">
+          </div>
+
+          <label for="inputCreateTime" class="col-sm-1 col-form-label">编号</label>
+          <div class="col-sm-2">
+            <input type="text" class="form-control" id="inputCreateTime" ng-model="detailImage.sortNum">
+          </div>
+
+          <label for="inputCreateTime" class="col-sm-1 col-form-label">图片</label>
+          <div class="col-sm-4">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="goodsDetailImg" name='goodsDetailImg'>
+              <label class="custom-file-label" for="goodsDetailImg">请选择产品明细图片...</label>
+            </div>
+          </div>
+          <div class="col-sm-1">
+            <button class="btn btn-primary" ng-click="saveGoodsDetailImg()">添 加</button>
+          </div>
+
+        </div>
+
+        <hr />
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-success" ng-click="deleteGoodsDetailImg()">删 除</button>
+            <table class="table table-striped table-hover" id="tableDetailImgs">
+              <thead class="bg-primary text-white">
+                <tr>
+                  <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+                  <th scope="col">序 号</th>
+                  <th scope="col" ng-hide={{true}}>ID</th>
+                  <th scope="col">标 题</th>
+                  <th scope="col">预 览</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="x in goodsDetailInfo.detailImgs">
+                  <td><input type="checkbox"></td>
+                  <td>{{x.sortNum}}</td>
+                  <td ng-hide={{true}}>{{x.id}}</td>
+                  <td>{{x.title}}</td>
+                  <td><img src="data:image/png;base64,{{x.imgData}}" width="30" height="30" alt="尚未上传产品图片" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
-    <form>
-      <div class="form-group row">
-        <label for="inputName" class="col-sm-2 col-form-label">名称</label>
-        <div class="col-sm-4">
-          <input type="text" class="form-control" id="inputName" placeholder="名称" ng-model="goodsDetailInfo.name">
-        </div>
-        <label for="inputRemark" class="col-sm-2 col-form-label">概要信息</label>
-        <div class="col-sm-4">
-          <input type="text" class="form-control" id="inputRemark" placeholder="概要信息" ng-model="goodsDetailInfo.summaryDescription">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="selectSupplier" class="col-sm-2 col-form-label">供应商</label>
-        <div class="col-sm-4">
-          <select class="form-control" ng-model="goodsDetailInfo.supplierId">
-            <option value="-1" ng-selected>请选择...</option>
-            <option ng-repeat="x in supplierListData" value="{{x.id}}">{{x.name}}</option>
-          </select>
-        </div>
-        <label for="inputPrice" class="col-sm-2 col-form-label">价格</label>
-        <div class="col-sm-4">
-          <input type="text" class="form-control" id="inputPrice" placeholder="价格（单位为厘）" ng-model="goodsDetailInfo.price">
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="selectDeliveryArea" class="col-sm-2 col-form-label">发货区域</label>
-        <div class="col-sm-4">
-          <select class="form-control" ng-model="goodsDetailInfo.deliveryAreaId">
-            <option value="-1">请选择...</option>
-            <option ng-repeat="x in deliveryAreaListData" value="{{x.id}}">{{x.name}}</option>
-          </select>
-        </div>
-        <label for="selectDeliveryFeeRule" class="col-sm-2 col-form-label">运费规则</label>
-        <div class="col-sm-4">
-          <select class="form-control" ng-model="goodsDetailInfo.deliveryFeeRuleId">
-            <option value="-1">请选择...</option>
-            <option ng-repeat="x in deliveryFeeRuleListData" value="{{x.id}}">{{x.name}}</option>
-          </select>
-        </div>
-      </div>
-
-      <div ng-hide="isAdd">
-        <div class="form-group row">
-          <label for="inputEnable" class="col-sm-2 col-form-label">创建人</label>
-          <div class="col-sm-4">
-            <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.createOperatorV">
-          </div>
-
-          <label for="inputCreateTime" class="col-sm-2 col-form-label">创建时间</label>
-          <div class="col-sm-4">
-            <input type="text" class="form-control" id="inputCreateTime" readonly="readonly" ng-model="goodsDetailInfo.createTime">
-          </div>
-
-        </div>
-
-        <div class="form-group row">
-
-          <label for="inputEnable" class="col-sm-2 col-form-label">是否有效</label>
-          <div class="col-sm-4">
-            <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.enableV">
-          </div>
-        </div>
-      </div>
-
-
-      <div class="form-group row">
-        <div class="col-sm-11">
-          <button type="submit" class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
-        </div>
-      </div>
-
-    </form>
-
-    <div ng-hide="isAdd">
-      <hr />
-      <!-- 产品主图 -->
-      <div class="row">
-        <div class="col-12">
-          <h5>主图信息</h5>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div class="custom-file">
-            <input type="file" class="custom-file-input" id="fileMainImg">
-            <label class="custom-file-label" for="customFile">请选择产品主图...</label>
-          </div>
-        </div>
-        <button class="btn btn-primary" ng-click="saveMainImg()">确 定</button>
-      </div>
-
-      <div class="row">
-        <div class="col-12">
-          <img src="data:image/png;base64,{{goodsDetailInfo.mainImgData}}" width="500" height="300" alt="尚未上传产品图片" />
-        </div>
-      </div>
-
-      <!-- 明细图片 -->
-      <hr />
-      <div class="row">
-        <div class="col-12">
-          <h5>明细图片信息</h5>
-        </div>
-      </div>
-      <div class="row">
-        <label for="inputEnable" class="col-sm-1 col-form-label">标 题</label>
-        <div class="col-sm-2">
-          <input type="text" class="form-control" id="inputEnable" ng-model="detailImage.title">
-        </div>
-
-        <label for="inputCreateTime" class="col-sm-1 col-form-label">编号</label>
-        <div class="col-sm-2">
-          <input type="text" class="form-control" id="inputCreateTime" ng-model="detailImage.sortNum">
-        </div>
-
-        <label for="inputCreateTime" class="col-sm-1 col-form-label">图片</label>
-        <div class="col-sm-4">
-          <div class="custom-file">
-            <input type="file" class="custom-file-input" id="goodsDetailImg" name='goodsDetailImg'>
-            <label class="custom-file-label" for="goodsDetailImg">请选择产品明细图片...</label>
-          </div>
-        </div>
-        <div class="col-sm-1">
-          <button class="btn btn-primary" ng-click="saveGoodsDetailImg()">添 加</button>
-        </div>
-
-      </div>
-
-      <hr />
-      <div class="row">
-        <div class="col">
-          <button class="btn btn-success" ng-click="deleteGoodsDetailImg()">删 除</button>
-          <table class="table table-striped table-hover" id="tableDetailImgs">
-            <thead class="bg-primary text-white">
-              <tr>
-                <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                <th scope="col">序 号</th>
-                <th scope="col" ng-hide={{true}}>ID</th>
-                <th scope="col">标 题</th>
-                <th scope="col">预 览</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="x in goodsDetailInfo.detailImgs">
-                <td><input type="checkbox"></td>
-                <td>{{x.sortNum}}</td>
-                <td ng-hide={{true}}>{{x.id}}</td>
-                <td>{{x.title}}</td>
-                <td><img src="data:image/png;base64,{{x.imgData}}" width="30" height="30" alt="尚未上传产品图片" /></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
   </div>
 
-  </div>
-
-   <!-- Modal -->
-   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered"  role="document" >
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
@@ -237,6 +237,11 @@
         deliveryAreaId: '-1',
         deliveryFeeRuleId: '-1'
       };
+
+      $scope.back2List = function () {
+        window.location = 'GoodsList.html';
+      };
+
 
       $scope.getSupplierListData = function () {
         var data = {
@@ -291,12 +296,12 @@
 
       $scope.getDeliveryFeeRuleListData = function () {
         $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/feerule/getList')
-                    .then(function (result) {  //正确请求成功时处理
-                        $scope.deliveryFeeRuleListData = result.data.data
-                        console.log('getData:', result);
-                    }).catch(function (result) { //捕捉错误处理
-                        console.log(result);
-                    });
+          .then(function (result) {  //正确请求成功时处理
+            $scope.deliveryFeeRuleListData = result.data.data
+            console.log('getData:', result);
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
       };
 
 
@@ -452,7 +457,7 @@
         console.log('$scope.deleteGoodsDetailImg():', ids);
 
         if (ids == null || ids.length == 0) {
-          $scope.modalContent='请选择待处理的数据！';
+          $scope.modalContent = '请选择待处理的数据！';
           $('#myModal').modal('show');
           return;
         }

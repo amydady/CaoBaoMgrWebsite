@@ -28,8 +28,8 @@
         <div class="row">
             <div class="col-3">
                 <div class="input-group">
-                    <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="名称"
-                        ng-keyup="enterEvent($event)" ng-model="search.name">
+                    <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="名称" ng-keyup="enterEvent($event)"
+                        ng-model="search.name">
                     <div class="input-group-prepend">
                         <button type="button" class="btn btn-outline-success" ng-click="onSearch()">查 询</button>
                     </div>
@@ -43,44 +43,73 @@
                 <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
             </div>
         </div>
-        <hr />
-        <!-- 数据区域 -->
-        <div class="row">
-            <div class="col">
-                <table class="table table-striped table-hover" id="table">
-                    <thead class="bg-primary text-white">
-                        <tr>
-                            <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                            <th scope="col" ng-hide={{true}}>ID</th>
-                            <th scope="col">名 称</th>
-                            <th scope="col">概要信息</th>
-                            <th scope="col">价 格</th>
-                            <th scope="col">可用库存</th>
-                            <th scope="col">创建时间</th>
-                            <th scope="col">是否有效</th>
-                            <th scope="col">业务管理</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="x in listData">
-                            <td><input type="checkbox"></td>
-                            <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
-                            <td>{{x.summaryDescription}}</td>
-                            <td>￥{{x.price}}</td>
-                            <td>￥{{x.currentInventory}}</td>
-                            <td>{{x.createTime}}</td>
-                            <td>{{x.enable=='Y'?'是':'否'}}</td>
-                            <td>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="secKillMgr(x.id)">秒杀</button>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="inventoryMgr(x.id)">库存</button>
-                                <button type="button" class="btn btn-secondary btn-sm" ng-click="commissionMgr(x.id)">佣金</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#yishangjia" role="tab" aria-controls="home"
+                    aria-selected="true">已上架</a>
+            </li>
+            <li class="nav-item" ng-hide="isAdd">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#daishangjia" role="tab" aria-controls="profile"
+                    aria-selected="false">待上架</a>
+            </li>
+            <li class="nav-item" ng-hide="isAdd">
+                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#yixiajia" role="tab" aria-controls="contact"
+                    aria-selected="false">已下架</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <br />
+            
+            <div class="tab-pane fade show active" id="yishangjia" role="tabpanel" aria-labelledby="home-tab">
+                <!-- 数据区域 -->
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-striped table-hover" id="table">
+                            <!-- <thead class="bg-primary text-white"> -->
+                            <thead class="bg-info text-white">
+                                <tr>
+                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+                                    <th scope="col" ng-hide={{true}}>ID</th>
+                                    <th scope="col">名 称</th>
+                                    <th scope="col">概要信息</th>
+                                    <th scope="col">价 格</th>
+                                    <th scope="col">可用库存</th>
+                                    <th scope="col">创建时间</th>
+                                    <th scope="col">是否有效</th>
+                                    <th scope="col">业务管理</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="x in listData">
+                                    <td><input type="checkbox"></td>
+                                    <td ng-hide={{true}}>{{x.id}}</td>
+                                    <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
+                                    <td>{{x.summaryDescription}}</td>
+                                    <td>￥{{x.price}}</td>
+                                    <td>￥{{x.currentInventory}}</td>
+                                    <td>{{x.createTime}}</td>
+                                    <td>{{x.enable=='Y'?'是':'否'}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-secondary btn-sm" ng-click="secKillMgr(x.id)">秒杀</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" ng-click="inventoryMgr(x.id)">库存</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" ng-click="commissionMgr(x.id)">佣金</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+            <div class="tab-pane fade show active" id="daishangjia" role="tabpanel" aria-labelledby="home-tab">
+                </div>
+            <div class="tab-pane fade show active" id="yixiajia" role="tabpanel" aria-labelledby="home-tab">
+            </div>
+
+
+
         </div>
+
 
     </div>
 
