@@ -39,44 +39,45 @@
 
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
-                <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
-                <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
+                <button type="button" class="btn btn-success" ng-click='onEnable()' ng-hide="hideShangjia">上 架</button>
+                <button type="button" class="btn btn-danger" ng-click='onDisable()' ng-hide="hideXiajia">下 架</button>
+                <button type="button" class="btn btn-danger" ng-click='onDelete()' ng-hide="hideShanchu">删 除</button>
             </div>
         </div>
+        <br />
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#yishangjia" role="tab" aria-controls="home"
-                    aria-selected="true">已上架</a>
+                <a class="nav-link active" id="yishangjia-tab" data-toggle="tab" href="#yishangjia" ng-click='onYTabClick()'
+                    role="tab" aria-controls="yishangjia" aria-selected="true">已上架</a>
             </li>
-            <li class="nav-item" ng-hide="isAdd">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#daishangjia" role="tab" aria-controls="profile"
-                    aria-selected="false">待上架</a>
+            <li class="nav-item">
+                <a class="nav-link" id="daishangjia-tab" data-toggle="tab" href="#daishangjia" ng-click='onITabClick()'
+                    role="tab" aria-controls="daishangjia" aria-selected="false">待上架</a>
             </li>
-            <li class="nav-item" ng-hide="isAdd">
-                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#yixiajia" role="tab" aria-controls="contact"
-                    aria-selected="false">已下架</a>
+            <li class="nav-item">
+                <a class="nav-link" id="yixiajia-tab" data-toggle="tab" href="#yixiajia" ng-click='onNTabClick()' role="tab"
+                    aria-controls="yixiajia" aria-selected="false">已下架</a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
             <br />
-            
+
             <div class="tab-pane fade show active" id="yishangjia" role="tabpanel" aria-labelledby="home-tab">
-                <!-- 数据区域 -->
+                <!-- 已上架数据区域 -->
                 <div class="row">
                     <div class="col">
-                        <table class="table table-striped table-hover" id="table">
+                        <table class="table table-striped table-hover" id="tableY">
                             <!-- <thead class="bg-primary text-white"> -->
                             <thead class="bg-info text-white">
                                 <tr>
-                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelY" ng-click="onSelectAllOrCancel('tableY')"></th>
                                     <th scope="col" ng-hide={{true}}>ID</th>
                                     <th scope="col">名 称</th>
                                     <th scope="col">概要信息</th>
                                     <th scope="col">价 格</th>
                                     <th scope="col">可用库存</th>
                                     <th scope="col">创建时间</th>
-                                    <th scope="col">是否有效</th>
                                     <th scope="col">业务管理</th>
                                 </tr>
                             </thead>
@@ -87,9 +88,8 @@
                                     <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
                                     <td>{{x.summaryDescription}}</td>
                                     <td>￥{{x.price}}</td>
-                                    <td>￥{{x.currentInventory}}</td>
+                                    <td>{{x.currentInventory}}</td>
                                     <td>{{x.createTime}}</td>
-                                    <td>{{x.enable=='Y'?'是':'否'}}</td>
                                     <td>
                                         <button type="button" class="btn btn-secondary btn-sm" ng-click="secKillMgr(x.id)">秒杀</button>
                                         <button type="button" class="btn btn-secondary btn-sm" ng-click="inventoryMgr(x.id)">库存</button>
@@ -101,9 +101,69 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade show active" id="daishangjia" role="tabpanel" aria-labelledby="home-tab">
+            <div class="tab-pane fade" id="daishangjia" role="tabpanel" aria-labelledby="home-tab">
+                <!-- 待上架数据区域 -->
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-striped table-hover" id="tableI">
+                            <!-- <thead class="bg-primary text-white"> -->
+                            <thead class="bg-info text-white">
+                                <tr>
+                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelI" ng-click="onSelectAllOrCancel('tableI')"></th>
+                                    <th scope="col" ng-hide={{true}}>ID</th>
+                                    <th scope="col">名 称</th>
+                                    <th scope="col">概要信息</th>
+                                    <th scope="col">价 格</th>
+                                    <th scope="col">可用库存</th>
+                                    <th scope="col">创建时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="x in listData">
+                                    <td><input type="checkbox"></td>
+                                    <td ng-hide={{true}}>{{x.id}}</td>
+                                    <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
+                                    <td>{{x.summaryDescription}}</td>
+                                    <td>￥{{x.price}}</td>
+                                    <td>￥{{x.currentInventory}}</td>
+                                    <td>{{x.createTime}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            <div class="tab-pane fade show active" id="yixiajia" role="tabpanel" aria-labelledby="home-tab">
+            </div>
+            <div class="tab-pane fade" id="yixiajia" role="tabpanel" aria-labelledby="home-tab">
+                <!-- 已下架数据区域 -->
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-striped table-hover" id="tableN">
+                            <!-- <thead class="bg-primary text-white"> -->
+                            <thead class="bg-info text-white">
+                                <tr>
+                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelN" ng-click="onSelectAllOrCancel('tableN')"></th>
+                                    <th scope="col" ng-hide={{true}}>ID</th>
+                                    <th scope="col">名 称</th>
+                                    <th scope="col">概要信息</th>
+                                    <th scope="col">价 格</th>
+                                    <th scope="col">可用库存</th>
+                                    <th scope="col">创建时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="x in listData">
+                                    <td><input type="checkbox"></td>
+                                    <td ng-hide={{true}}>{{x.id}}</td>
+                                    <th scope="row"><a href="GoodsDetail.html?id={{x.id}}">{{x.name}}</a></td>
+                                    <td>{{x.summaryDescription}}</td>
+                                    <td>￥{{x.price}}</td>
+                                    <td>￥{{x.currentInventory}}</td>
+                                    <td>{{x.createTime}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
 
@@ -127,14 +187,16 @@
 
         app.controller('myCtrl', function ($scope, $http) {
             $scope.search = {
-                name: ''
+                name: '',
+                enable: 'Y'
             };
-
-
+            $scope.hideShangjia = true;
+            $scope.hideXiajia = false;
+            $scope.hideShanchu = true;
 
             $scope.getData = function () {
-
-                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getList4WebApp?name=' + $scope.search.name)
+                $scope.resetSelectStatus();
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getList4WebApp?name=' + $scope.search.name + '&enable=' + $scope.search.enable)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
@@ -145,12 +207,39 @@
                     });
             };
 
+            // 已上架tab页点击事件
+            $scope.onYTabClick = function () {
+                $scope.search.enable = 'Y';
+                $scope.hideShangjia = true;
+                $scope.hideXiajia = false;
+                $scope.hideShanchu = true;
+                $scope.getData();
+            };
+
+            // 待上架tab页点击事件
+            $scope.onITabClick = function () {
+                $scope.search.enable = 'I';
+                $scope.hideShangjia = false;
+                $scope.hideXiajia = true;
+                $scope.hideShanchu = false;
+                $scope.getData();
+            };
+
+            // 已下架tab页点击事件
+            $scope.onNTabClick = function () {
+                $scope.search.enable = 'N';
+                $scope.hideShangjia = false;
+                $scope.hideXiajia = true;
+                $scope.hideShanchu = true;
+                $scope.getData();
+            };
+
             $scope.onSearch = function () {
                 $scope.getData();
             };
 
-            $scope.onSelectAllOrCancel = function () {
-                TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.listData.length);
+            $scope.onSelectAllOrCancel = function (tablId) {
+                TableUtil.selectAllOrCncel(tablId, !$scope.selectAll, 1, $scope.listData.length);
                 $scope.selectAll = !$scope.selectAll;
             };
 
@@ -160,16 +249,13 @@
 
             //重置记录的选择状态
             $scope.resetSelectStatus = function () {
-                document.getElementById('cbxSelectAllOrCancel').checked = false;
+                document.getElementById('cbxSelectAllOrCancel' + $scope.search.enable).checked = false;
                 $scope.selectAll = false;
-            }
+            };
 
             //置失效
             $scope.onDisable = function () {
-                $scope.resetSelectStatus();
-                AlertUtil.clearAlert('alertInfo');
-
-                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
+                var ids = TableUtil.getSelectedIds('table' + $scope.search.enable, 1, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
@@ -184,13 +270,28 @@
                         console.log(result);
                     });
             };
+            //删除
+            $scope.onDelete = function () {
+                var ids = TableUtil.getSelectedIds('table' + $scope.search.enable, 1, 1, $scope.listData.length);
+
+                if (ids == null || ids.length == 0) {
+                    AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
+                    return;
+                }
+
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/batchdisable', ids, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log(result);
+                        $scope.getData();
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+            
 
             //置生效
             $scope.onEnable = function () {
-                $scope.resetSelectStatus();
-                AlertUtil.clearAlert('alertInfo');
-
-                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
+                var ids = TableUtil.getSelectedIds('table' + $scope.search.enable, 1, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);

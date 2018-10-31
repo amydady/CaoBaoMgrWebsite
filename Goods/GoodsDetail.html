@@ -103,9 +103,9 @@
 
             <div class="form-group row">
 
-              <label for="inputEnable" class="col-sm-2 col-form-label">是否有效</label>
+              <label for="inputEnable" class="col-sm-2 col-form-label">状 态</label>
               <div class="col-sm-4">
-                <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.enableV">
+                <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.stateName">
               </div>
             </div>
           </div>
@@ -311,11 +311,16 @@
           .then(function (result) {  //正确请求成功时处理
 
             $scope.goodsDetailInfo = result.data.data[0];
-            $scope.goodsDetailInfo.enableV = $scope.goodsDetailInfo.enable == 'Y' ? '是' : '否';
 
-            console.log(result);
-            console.log('$scope.goodsDetailInfo:', $scope.goodsDetailInfo);
-
+            if ($scope.goodsDetailInfo.enable == 'Y') {
+              $scope.goodsDetailInfo.stateName = '已上架'
+            }
+            if ($scope.goodsDetailInfo.enable == 'I') {
+              $scope.goodsDetailInfo.stateName = '待上架'
+            }
+            if ($scope.goodsDetailInfo.enable == 'N') {
+              $scope.goodsDetailInfo.stateName = '已下架'
+            }
           }).catch(function (result) { //捕捉错误处理
             console.log(result);
           });
