@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+  <title>QuanziDetail</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+  <div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-2">
+        <h4>合作伙伴详情</h4>
+      </div>
+
+      <div class="col-10" id='alertInfo'>
+
+      </div>
+    </div>
+
+    <form>
+      <div class="form-group row">
+        <label for="inputTuanZhangName" class="col-sm-2 col-form-label">姓 名</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputTuanZhangName" readonly ng-model="detailInfo.tuanZhangName">
+        </div>
+        <label for="inputName" class="col-sm-2 col-form-label">名 称</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputName" readonly ng-model="detailInfo.name">
+        </div>
+      </div>
+      <div class="form-group row">
+
+        <label for="inputName" class="col-sm-2 col-form-label">城 市</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputName" readonly ng-model="detailInfo.addressInfo.city">
+        </div>
+        <label for="inputArea" class="col-sm-2 col-form-label">区 县</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputArea" readonly ng-model="detailInfo.addressInfo.area">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="inpuDetailInfo" class="col-sm-2 col-form-label">详细地址</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inpuDetailInfo" readonly ng-model="detailInfo.addressInfo.detailInfo">
+        </div>
+        <label for="inpuMobile" class="col-sm-2 col-form-label">手机号码</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inpuMobile" readonly ng-model="detailInfo.mobile">
+        </div>
+      </div>
+
+      <div class="form-group row">
+
+        <label for="inputState" class="col-sm-2 col-form-label">证件照片（正）</label>
+        <div class="col-sm-4">
+          <img src="data:image/png;base64,{{x.idCardImgDataFront}}" height="50" alt="无图片" />
+        </div>
+        <label for="inputState" class="col-sm-2 col-form-label">证件照片（反）</label>
+        <div class="col-sm-4">
+          <img src="data:image/png;base64,{{x.idCardImgDataBack}}" height="50" alt="无图片" />
+        </div>
+      </div>
+
+      <div class="form-group row">
+
+        <label for="inputState" class="col-sm-2 col-form-label">状 态</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputState" readonly ng-model="detailInfo.state">
+        </div>
+        <label for="inputCreateTime" class="col-sm-2 col-form-label">创建时间</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputCreateTime" readonly ng-model="detailInfo.createTime">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="inputApproveRemark" class="col-sm-2 col-form-label">审核意见</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputApproveRemark" readonly ng-model="detailInfo.approveRemark">
+        </div>
+        <label for="inputApproveTime" class="col-sm-2 col-form-label">审核时间</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputApproveTime" readonly ng-model="detailInfo.approveTime">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-sm-11">
+          <button type="button" class="btn btn-success" ng-click="shenHe('Y')" ng-hide="!needShenHe">审核通过</button>
+          <button type="button" class="btn btn-danger" ng-click="shenHe('X')" ng-hide="!needShenHe">审核不过</button>
+          <button type="button" class="btn btn-secondary" ng-click="back2List()">返 回</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
+
+  <script>
+    var app = angular.module('myApp', []);
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+      $scope.detailInfo = {
+        id: RequestUtil.getQueryParamByName('id')
+      };
+
+      if (StringUtil.isEmpty($scope.detailInfo.id)) {
+        return;//TODO
+
+      }
+
+      $scope.needShenHe = false;
+
+      $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getById?id=' + $scope.detailInfo.id)
+        .then(function (result) {  //正确请求成功时处理
+          $scope.detailInfo = result.data.data[0];
+          if ($scope.detailInfo.enable == 'I') {
+            $scope.detailInfo.state = '待审核';
+            $('#inputApproveRemark').removeAttr('readonly');
+            $scope.needShenHe = true;
+          }
+
+          if ($scope.detailInfo.enable == 'Y') {
+            $scope.detailInfo.state = '生效';
+          }
+
+          if ($scope.detailInfo.enable == 'N') {
+            $scope.detailInfo.state = '失效';
+          }
+
+          if ($scope.detailInfo.enable == 'X') {
+            $scope.detailInfo.state = '审核不过';
+          }
+        }).catch(function (result) { //捕捉错误处理
+          console.log(result);
+        });
+
+      $scope.shenHe = function (enable) {
+        var tuanShenheReqInfo={
+          id:$scope.detailInfo.id,
+          enable:enable,
+          approveRemark:$scope.detailInfo.approveRemark
+        };
+
+        $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/shenhe', tuanShenheReqInfo, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              if(result.data.code=='NONE_ERROR'){
+                AlertUtil.successWithCloseButton('alertInfo', '审核成功！', AlertUtil.defaultTimeout);
+              }
+              else{
+                AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
+              }
+              
+            }).catch(function (result) { //捕捉错误处理
+              AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
+              console.log(result);
+            });
+      };
+
+      $scope.back2List = function () {
+        window.location = 'QuanziList.html';
+      };
+
+      $scope.saveData = function () {
+        if (!$scope.formValid()) {
+          return;
+        }
+
+        if ($scope.isAdd) {//新增
+
+          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', $scope.supplierInfo, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              window.location = 'SupplierList.html'
+            }).catch(function (result) { //捕捉错误处理
+              console.log(result);
+            });
+        }
+        else {//修改
+
+          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/modify', $scope.supplierInfo, CommonConfig.httpReqConfig)
+            .then(function (result) {  //正确请求成功时处理
+              AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
+            }).catch(function (result) { //捕捉错误处理
+              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+              console.log(result);
+            });
+        }
+      };
+
+    }]);
+
+
+  </script>
+</body>
+
+</html>

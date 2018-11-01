@@ -43,9 +43,8 @@
             </div>
 
             <div class="col" align="right">
-                <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
-                <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
-                <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
+                <button type="button" class="btn btn-success" ng-click='onEnable()' ng-hide="hideEnable">生 效</button>
+                <button type="button" class="btn btn-danger" ng-click='onDisable()' ng-hide="hideDisable">失 效</button>
             </div>
         </div>
         <br />
@@ -76,27 +75,33 @@
                 <!-- 待审核数据区域 -->
                 <div class="row">
                     <div class="col">
-                        <table class="table table-striped table-hover" id="tabledaishenhe">
-                            <thead class="bg-primary text-white">
+                        <table class="table table-striped table-hover" id="tableI">
+                            <thead class="bg-info text-white">
                                 <tr>
-                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCanceldaishenhe" ng-click="onSelectAllOrCancel()"></th>
+                                    <th scope="col" ng-hide={{true}}><input type="checkbox" id="cbxSelectAllOrCancelI" ng-click="onSelectAllOrCancel()"></th>
                                     <th scope="col">序 号</th>
                                     <th scope="col" ng-hide={{true}}>ID</th>
                                     <th scope="col">名 称</th>
-                                    <th scope="col">备 注</th>
+                                    <th scope="col">姓 名</th>
+                                    <th scope="col">城 市</th>
+                                    <th scope="col">区 县</th>
+                                    <th scope="col">地 址</th>
+                                    <th scope="col">手 机</th>
                                     <th scope="col">创建时间</th>
-                                    <th scope="col">是否有效</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="x in listData">
-                                    <td><input type="checkbox"></td>
+                                    <td ng-hide={{true}}><input type="checkbox"></td>
                                     <td>{{ $index + 1 }}</td>
                                     <td ng-hide={{true}}>{{x.id}}</td>
-                                    <th scope="row"><a href="SupplierDetail.html?id={{x.id}}">{{x.name}}</a></th>
-                                    <td>{{x.remark}}</td>
+                                    <th scope="row"><a href="QuanziDetail.html?id={{x.id}}">{{x.name}}</a></th>
+                                    <td>{{x.tuanZhangName}}</td>
+                                    <td>{{x.addressInfo.city}}</td>
+                                    <td>{{x.addressInfo.area}}</td>
+                                    <td>{{x.addressInfo.detailInfo}}</td>
+                                    <td>{{x.mobile}}</td>
                                     <td>{{x.createTime}}</td>
-                                    <td>{{x.enable=='Y'?'是':'否'}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -108,16 +113,20 @@
                 <!-- 生效数据区域 -->
                 <div class="row">
                     <div class="col">
-                        <table class="table table-striped table-hover" id="tableenable">
-                            <thead class="bg-primary text-white">
+                        <table class="table table-striped table-hover" id="tableY">
+                            <thead class="bg-info text-white">
                                 <tr>
-                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelenable" ng-click="onSelectAllOrCancel()"></th>
+                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelY" ng-click="onSelectAllOrCancel()"></th>
                                     <th scope="col">序 号</th>
                                     <th scope="col" ng-hide={{true}}>ID</th>
                                     <th scope="col">名 称</th>
-                                    <th scope="col">备 注</th>
+                                    <th scope="col">姓 名</th>
+                                    <th scope="col">城 市</th>
+                                    <th scope="col">区 县</th>
+                                    <th scope="col">地 址</th>
+                                    <th scope="col">手 机</th>
                                     <th scope="col">创建时间</th>
-                                    <th scope="col">是否有效</th>
+                                    <th scope="col">审核时间</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,10 +134,14 @@
                                     <td><input type="checkbox"></td>
                                     <td>{{ $index + 1 }}</td>
                                     <td ng-hide={{true}}>{{x.id}}</td>
-                                    <th scope="row"><a href="SupplierDetail.html?id={{x.id}}">{{x.name}}</a></th>
-                                    <td>{{x.remark}}</td>
+                                    <th scope="row"><a href="QuanziDetail.html?id={{x.id}}">{{x.name}}</a></th>
+                                    <td>{{x.tuanZhangName}}</td>
+                                    <td>{{x.addressInfo.city}}</td>
+                                    <td>{{x.addressInfo.area}}</td>
+                                    <td>{{x.addressInfo.detailInfo}}</td>
+                                    <td>{{x.mobile}}</td>
                                     <td>{{x.createTime}}</td>
-                                    <td>{{x.enable=='Y'?'是':'否'}}</td>
+                                    <td>{{x.approveTime}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -140,16 +153,20 @@
                 <!-- 已失效数据区域 -->
                 <div class="row">
                     <div class="col">
-                        <table class="table table-striped table-hover" id="tabledisable">
-                            <thead class="bg-primary text-white">
+                        <table class="table table-striped table-hover" id="tableN">
+                            <thead class="bg-info text-white">
                                 <tr>
-                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCanceldisable" ng-click="onSelectAllOrCancel()"></th>
+                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelN" ng-click="onSelectAllOrCancel()"></th>
                                     <th scope="col">序 号</th>
                                     <th scope="col" ng-hide={{true}}>ID</th>
                                     <th scope="col">名 称</th>
-                                    <th scope="col">备 注</th>
+                                    <th scope="col">姓 名</th>
+                                    <th scope="col">城 市</th>
+                                    <th scope="col">区 县</th>
+                                    <th scope="col">地 址</th>
+                                    <th scope="col">手 机</th>
                                     <th scope="col">创建时间</th>
-                                    <th scope="col">是否有效</th>
+                                    <th scope="col">审核时间</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -157,10 +174,14 @@
                                     <td><input type="checkbox"></td>
                                     <td>{{ $index + 1 }}</td>
                                     <td ng-hide={{true}}>{{x.id}}</td>
-                                    <th scope="row"><a href="SupplierDetail.html?id={{x.id}}">{{x.name}}</a></th>
-                                    <td>{{x.remark}}</td>
+                                    <th scope="row"><a href="QuanziDetail.html?id={{x.id}}">{{x.name}}</a></th>
+                                    <td>{{x.tuanZhangName}}</td>
+                                    <td>{{x.addressInfo.city}}</td>
+                                    <td>{{x.addressInfo.area}}</td>
+                                    <td>{{x.addressInfo.detailInfo}}</td>
+                                    <td>{{x.mobile}}</td>
                                     <td>{{x.createTime}}</td>
-                                    <td>{{x.enable=='Y'?'是':'否'}}</td>
+                                    <td>{{x.approveTime}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -168,31 +189,38 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="shenhebuguo" role="tabpanel" aria-labelledby="home-tab">
-                <!-- 待审核数据区域 -->
+                <!-- 审核不过数据区域 -->
                 <div class="row">
                     <div class="col">
-                        <table class="table table-striped table-hover" id="tableshenhebuguo">
-                            <thead class="bg-primary text-white">
+                        <table class="table table-striped table-hover" id="tableX">
+                            <thead class="bg-info text-white">
                                 <tr>
-                                    <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancelshenhebuguo"
-                                            ng-click="onSelectAllOrCancel()"></th>
+                                    <th scope="col" ng-hide={{true}}><input type="checkbox" id="cbxSelectAllOrCancelX" ng-click="onSelectAllOrCancel()"></th>
                                     <th scope="col">序 号</th>
                                     <th scope="col" ng-hide={{true}}>ID</th>
                                     <th scope="col">名 称</th>
-                                    <th scope="col">备 注</th>
+                                    <th scope="col">姓 名</th>
+                                    <th scope="col">城 市</th>
+                                    <th scope="col">区 县</th>
+                                    <th scope="col">地 址</th>
+                                    <th scope="col">手 机</th>
                                     <th scope="col">创建时间</th>
-                                    <th scope="col">是否有效</th>
+                                    <th scope="col">审核时间</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="x in listData">
-                                    <td><input type="checkbox"></td>
+                                    <td ng-hide={{true}}><input type="checkbox"></td>
                                     <td>{{ $index + 1 }}</td>
                                     <td ng-hide={{true}}>{{x.id}}</td>
-                                    <th scope="row"><a href="SupplierDetail.html?id={{x.id}}">{{x.name}}</a></th>
-                                    <td>{{x.remark}}</td>
+                                    <th scope="row"><a href="QuanziDetail.html?id={{x.id}}">{{x.name}}</a></th>
+                                    <td>{{x.tuanZhangName}}</td>
+                                    <td>{{x.addressInfo.city}}</td>
+                                    <td>{{x.addressInfo.area}}</td>
+                                    <td>{{x.addressInfo.detailInfo}}</td>
+                                    <td>{{x.mobile}}</td>
                                     <td>{{x.createTime}}</td>
-                                    <td>{{x.enable=='Y'?'是':'否'}}</td>
+                                    <td>{{x.approveTime}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -200,7 +228,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
 
@@ -217,21 +245,16 @@
 
         app.controller('myCtrl', function ($scope, $http) {
             $scope.search = {
-                approveResult: '',
-                enable: '',
+                enable: 'I',
                 name: ''
             };
 
-            // $scope.hideShangjia = true;
-            // $scope.hideXiajia = false;
-            // $scope.hideShanchu = true;
-
-            //daishenhe;shenhebuguo;enable;disable
-            $scope.currentTabIndex = 'daishenhe';
+            $scope.hideEnable = true;
+            $scope.hideDisable = true;
 
             $scope.getData = function () {
                 $scope.resetSelectStatus();
-                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getList?approveResult=' + $scope.search.approveResult + '&enable=' + $scope.search.enable + '&name=' + $scope.search.name)
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getList?enable=' + $scope.search.enable + '&name=' + $scope.search.name)
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
                     }).catch(function (result) { //捕捉错误处理
@@ -240,32 +263,37 @@
             };
 
             $scope.onDaiShenHeTabClick = function () {
-                $scope.search.approveResult = 'I';
+                $scope.search.enable = 'I';
+                $scope.hideEnable = true;
+                $scope.hideDisable = true;
                 $scope.getData();
             };
 
             $scope.onEnableTabClick = function () {
                 $scope.search.enable = 'Y';
+                $scope.hideEnable = true;
+                $scope.hideDisable = false;
                 $scope.getData();
             };
 
             $scope.onDisableTabClick = function () {
                 $scope.search.enable = 'N';
+                $scope.hideEnable = false;
+                $scope.hideDisable = true;
                 $scope.getData();
             };
 
             $scope.onShenHeBuGuoTabClick = function () {
-                $scope.search.approveResult = 'N';
+                $scope.search.enable = 'X';
+                $scope.hideEnable = true;
+                $scope.hideDisable = true;
+
                 $scope.getData();
             };
 
             $scope.onSelectAllOrCancel = function () {
-                TableUtil.selectAllOrCncel('tableSupplierList', !$scope.selectAll, 1, $scope.supplierListData.length);
+                TableUtil.selectAllOrCncel('table' + $scope.search.enable, !$scope.selectAll, 1, $scope.listData.length);
                 $scope.selectAll = !$scope.selectAll;
-            };
-
-            $scope.add = function () {
-                window.location = "SupplierDetail.html";
             };
 
             $scope.onSearch = function () {
@@ -274,21 +302,21 @@
 
             //重置记录的选择状态
             $scope.resetSelectStatus = function () {
-                document.getElementById('cbxSelectAllOrCancel'+$scope.currentTabIndex).checked = false;
+                document.getElementById('cbxSelectAllOrCancel' + $scope.search.enable).checked = false;
                 $scope.selectAll = false;
             }
 
             //置失效
             $scope.onDisable = function () {
 
-                var ids = TableUtil.getSelectedIds('table'+$scope.currentTabIndex, 2, 1, $scope.listData.length);
+                var ids = TableUtil.getSelectedIds('table' + $scope.search.enable, 2, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/batchdisable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/batchdisable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -300,14 +328,14 @@
             //置生效
             $scope.onEnable = function () {
 
-                var ids = TableUtil.getSelectedIds('table'+$scope.currentTabIndex, 2, 1, $scope.supplierListData.length);
+                var ids = TableUtil.getSelectedIds('table' + $scope.search.enable, 2, 1, $scope.listData.length);
 
                 if (ids == null || ids.length == 0) {
                     AlertUtil.dangerWithCloseButton('alertInfo', '请选择待处理的数据！', AlertUtil.defaultTimeout);
                     return;
                 }
 
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/batchenable', ids, CommonConfig.httpReqConfig)
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/batchenable', ids, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log(result);
                         $scope.getData();
@@ -326,12 +354,8 @@
             };
 
             //页面初始化
-            $scope.onInit = function () {
-                $scope.selectAll = false;
-                $scope.getData();
-            };
-
-            $scope.onInit();
+            $scope.selectAll = false;
+            $scope.getData();
         });
     </script>
 </body>
