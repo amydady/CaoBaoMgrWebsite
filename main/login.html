@@ -10,20 +10,29 @@
     <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
     <title>系统登录</title>
+
+    <style>
+        /* 样式：TODO */
+    </style>
+
 </head>
 
-<body ng-app="myApp" ng-controller="myCtrl">
+<body ng-app="myApp" ng-controller="myCtrl" class=" bg-light">
     <div class="container-fluid">
+        <div id='alertInfo'>
+
+        </div>
         <form>
             <div class="form-group">
-                <input type="text" class="form-control" id="inputId" ng-model='identity' ng-change='onInputIdChanged();' placeholder="用户名/邮箱/微信号/手机号">
+                <input type="text" class="form-control" id="inputId" ng-model='loginInfo.identity' ng-change='onInputIdChanged();'
+                    placeholder="用户名/邮箱/微信号/手机号" autofocus>
             </div>
             <div class="form-group">
-                <input type="password" class="form-control" id="inputPwd"  ng-model='password' ng-change='onInputPwdChanged();' placeholder="密 码">
+                <input type="password" class="form-control" id="inputPwd" ng-model='loginInfo.pwd' ng-change='onInputPwdChanged();'
+                    placeholder="密 码">
             </div>
-            <button class="btn btn-primary" ng-click='signIn()'>登 录</button>
+            <button class="btn btn-lg btn-primary btn-block" ng-click='signIn()'>登 录</button>
         </form>
-
     </div>
 
 
@@ -40,9 +49,32 @@
 
         app.controller('myCtrl', function ($scope, $http) {
 
+            $scope.loginInfo = {
+                identity: '',
+                pwd: ''
+            };
+
             // 登录确定事件
-            $scope.signIn = function(){
-                $scope.formValid();
+            $scope.signIn = function () {
+                if (!$scope.formValid()) {
+                    return;
+                }
+
+                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/login', $scope.loginInfo, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        if (result.data.code != 'NONE_ERROR') {
+                            AlertUtil.dangerWithCloseButton('alertInfo', '登录失败！', AlertUtil.defaultTimeout);
+                            return;
+                        }
+
+                        window.sessionStorage.setItem("currentUserId", result.data.data[0].id);
+                        window.location = 'main.html';
+
+
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+
             };
 
             //表单验证
@@ -50,7 +82,7 @@
                 var validResult = true;
 
                 var inputPwd = $('#inputPwd');
-                if (StringUtil.isEmpty($scope.password)) {
+                if (StringUtil.isEmpty($scope.loginInfo.pwd)) {
                     inputPwd.addClass('is-invalid');
                     validResult = false;
                 }
@@ -60,7 +92,7 @@
 
 
                 var inputId = $('#inputId');
-                if (StringUtil.isEmpty($scope.identity)) {
+                if (StringUtil.isEmpty($scope.loginInfo.identity)) {
                     inputId.addClass('is-invalid');
                     validResult = false;
                 }
@@ -68,7 +100,7 @@
                     inputId.removeClass('is-invalid');
                 }
 
-                
+
                 return validResult;
             };
 

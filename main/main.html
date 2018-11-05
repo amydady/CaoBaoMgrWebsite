@@ -49,8 +49,8 @@
         <div id="accordion">
           <div class="card">
             <div class="card-header">
-                <!-- href="#collapseOne" -->
-              <a class="card-link" data-toggle="collapse" >
+              <!-- href="#collapseOne" -->
+              <a class="card-link" data-toggle="collapse">
                 {{leftMenuData.pname}}
               </a>
             </div>
@@ -70,101 +70,109 @@
           <iframe id="if_content" style="width:100%" scrolling="yes" frameborder='0' name="if_content"></iframe>
         </div>
       </div>
-
-      <!-- footer -->
-      <div class="row">
-        <div class="col">
-          <!-- <h1>FOOT</h1> -->
-        </div>
-      </div>
-
     </div>
 
+    <!-- footer -->
+    <div class="row">
+      <div class="col">
+        <!-- <h1>FOOT</h1> -->
+      </div>
+    </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="../lib/jquery/jquery.3.2.1.js"></script>
-    <script src="../lib/popper/popper.1.12.9.js"></script>
-    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../lib/angular-1.7.5/angular.min.js"></script>
-    <script src="../common/littleCatCommon.js"></script>
+  </div>
 
-    <script>
-      var app = angular.module('myApp', []);
 
-      // iframe 自适应高度
-      function changeFrameHeight() {
-        var ifm = document.getElementById("if_content");
-        ifm.height = document.documentElement.clientHeight;
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
 
+  <script>
+    var app = angular.module('myApp', []);
+
+    // iframe 自适应高度
+    function changeFrameHeight() {
+      var ifm = document.getElementById("if_content");
+      ifm.height = document.documentElement.clientHeight;
+
+    }
+
+    window.onresize = function () {
+      changeFrameHeight();
+    }
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+
+      if (StringUtil.isEmpty(sessionStorage.getItem("currentUserId"))) {//尚未登录
+        window.location = '../main/login.html';
       }
 
-      window.onresize = function () {
-        changeFrameHeight();
-      }
+      $scope.currentUserInfo=
 
-      app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+      //获取进入页面时的MenuID
+      $scope.menuId = RequestUtil.getQueryParamByName('menuId');
+      $scope.menuName = RequestUtil.getQueryParamByName('menuName');
 
-        //获取进入页面时的MenuID
-        $scope.menuId = RequestUtil.getQueryParamByName('menuId');
-        $scope.menuName = RequestUtil.getQueryParamByName('menuName');
+      changeFrameHeight();
 
-        changeFrameHeight();
 
-        //加载顶级导航菜单
-        $scope.loadNavMenu = function () {
-          $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=-1')
-            .then(function (result) {  //正确请求成功时处理
-              $scope.navMenuData = result.data.data;
+      //加载顶级导航菜单
+      $scope.loadNavMenu = function () {
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=-1')
+          .then(function (result) {  //正确请求成功时处理
+            $scope.navMenuData = result.data.data;
 
-              if (StringUtil.isEmpty($scope.menuId)) {
-                for (var i = 0; i < $scope.navMenuData.length; i++) {
-                  if ($scope.navMenuData[i].isDefault == 'Y') {
-                    $scope.menuId = $scope.navMenuData[i].id;
-                    $scope.menuName = $scope.navMenuData[i].name;
-                    break;
-                  }
+            if (StringUtil.isEmpty($scope.menuId)) {
+              for (var i = 0; i < $scope.navMenuData.length; i++) {
+                if ($scope.navMenuData[i].isDefault == 'Y') {
+                  $scope.menuId = $scope.navMenuData[i].id;
+                  $scope.menuName = $scope.navMenuData[i].name;
+                  break;
                 }
               }
+            }
 
-              $scope.loadLeftMenu($scope.menuId, $scope.menuName);
+            $scope.loadLeftMenu($scope.menuId, $scope.menuName);
 
-            }).catch(function (result) { //捕捉错误处理
-              console.log(result);
-            });
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      //通过PID加载左侧菜单
+      $scope.loadLeftMenu = function (pid, pname) {
+        $scope.leftMenuData = {
+          pname: pname
         };
 
-        //通过PID加载左侧菜单
-        $scope.loadLeftMenu = function (pid, pname) {
-          $scope.leftMenuData = {
-            pname: pname
-          };
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=' + pid)
+          .then(function (result) {  //正确请求成功时处理
+            $scope.leftMenuData.menuData = result.data.data;
 
-          $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/menu/getbypid?pid=' + pid)
-            .then(function (result) {  //正确请求成功时处理
-              $scope.leftMenuData.menuData = result.data.data;
-
-              //加载默认页面
-              for (var i = 0; i < $scope.leftMenuData.menuData.length; i++) {
-                if ($scope.leftMenuData.menuData[i].isDefault == 'Y') {
-                  document.getElementById('if_content').src = $scope.leftMenuData.menuData[i].targetUrl;
-                  console.log('if_content.src:', document.getElementById('if_content').src);
-                }
+            //加载默认页面
+            for (var i = 0; i < $scope.leftMenuData.menuData.length; i++) {
+              if ($scope.leftMenuData.menuData[i].isDefault == 'Y') {
+                document.getElementById('if_content').src = $scope.leftMenuData.menuData[i].targetUrl;
+                console.log('if_content.src:', document.getElementById('if_content').src);
               }
+            }
 
-              console.log(' $scope.leftMenuData:success:', $scope.leftMenuData);
-            }).catch(function (result) { //捕捉错误处理
-              console.log('$scope.loadLeftMenu:error:', result);
-            });
-        };
+            console.log(' $scope.leftMenuData:success:', $scope.leftMenuData);
+          }).catch(function (result) { //捕捉错误处理
+            console.log('$scope.loadLeftMenu:error:', result);
+          });
+      };
 
-        $scope.loadNavMenu();
+      $scope.loadNavMenu();
 
-      }]);
+    }]);
 
-      
 
-    </script>
+
+  </script>
 </body>
 
 </html>

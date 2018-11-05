@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+  <title>修改密码</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+  <div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-2">
+        <h4>修改密码</h4>
+      </div>
+
+      <div class="col-10" id='alertInfo'>
+
+      </div>
+    </div>
+
+    <form>
+      <div class="form-group row">
+        <label for="inputoldPwd" class="col-sm-2 col-form-label">原密码</label>
+        <div class="col-sm-10">
+          <input type="password" class="form-control" id="inputoldPwd" placeholder="原密码" ng-change='formValid()'
+            ng-model="oldPwd">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="inputnewPwd" class="col-sm-2 col-form-label">新密码</label>
+        <div class="col-sm-10">
+          <input type="password" class="form-control" id="inputnewPwd" placeholder="新密码" ng-change='formValid()'
+            ng-model="newPwd">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="inputpwdAgain" class="col-sm-2 col-form-label">再次确认</label>
+        <div class="col-sm-10">
+          <input type="password" class="form-control" id="inputpwdAgain" placeholder="新密码确认，请保证两次输入相同" ng-change='formValid()'
+            ng-model="pwdAgain">
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-11">
+          <button type="button" class="btn btn-primary" ng-click="saveData()">确 定</button>
+          <button type="button" class="btn btn-secondary" ng-click="cancel()">取 消</button>
+
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div id='alertInfo'>
+
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{modalContent}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
+
+  <script>
+    var app = angular.module('myApp', []);
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+      $scope.supplierInfo = {
+        id: RequestUtil.getQueryParamByName('id')
+      };
+
+      //表单验证
+      $scope.formValid = function () {
+        var validResult = true;
+
+        var inputoldPwd = $('#inputoldPwd');
+        if (StringUtil.isEmpty($scope.oldPwd)) {
+          inputoldPwd.addClass('is-invalid');
+          validResult = false;
+        }
+        else {
+          inputoldPwd.removeClass('is-invalid');
+        }
+
+
+        var inputnewPwd = $('#inputnewPwd');
+        if (StringUtil.isEmpty($scope.newPwd)) {
+          inputnewPwd.addClass('is-invalid');
+          validResult = false;
+        }
+        else {
+          inputnewPwd.removeClass('is-invalid');
+        }
+
+
+        var inputpwdAgain = $('#inputpwdAgain');
+        if (StringUtil.isEmpty($scope.pwdAgain)) {
+          inputpwdAgain.addClass('is-invalid');
+          validResult = false;
+        }
+        else {
+          inputpwdAgain.removeClass('is-invalid');
+        }
+
+
+
+
+        return validResult;
+      };
+
+
+      $scope.cancel = function () {
+        window.location = '../main/main.html';
+      };
+
+      $scope.saveData = function () {
+        if (!$scope.formValid()) {
+          return;
+        }
+
+        if ($scope.newPwd != $scope.pwdAgain) {
+          AlertUtil.dangerWithCloseButton('alertInfo', '两次密码输入不一致！', AlertUtil.defaultTimeout);
+          $scope.newPwd = $scope.pwdAgain = '';
+          return;
+        };
+
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/changepassword', { id: $scope.id, oldPwd: $scope.oldPwd, pwd: $scope.newPwd }, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            if (result.data.code == "NONE_ERROR") {
+              $scope.modalContent = '密码修改成功！';
+              $("#myModal").modal('show');
+              $('#myModal').on('hidden.bs.modal', function (e) {
+                window.location = '../main/main.html';
+              });
+            }
+            else if (result.data.code == "OldPwdIsError") {
+              AlertUtil.dangerWithCloseButton('alertInfo', '原密码不正确！', AlertUtil.defaultTimeout);
+              $scope.oldPwd = '';
+              $("#inputoldPwd").focus();
+              return;
+            }
+            else {
+              AlertUtil.dangerWithCloseButton('alertInfo', '密码修改失败！', AlertUtil.defaultTimeout);
+              $scope.oldPwd = $scope.newPwd = $scope.pwdAgain = '';
+              $("#inputoldPwd").focus();
+              return;
+            }
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+    }]);
+
+
+  </script>
+</body>
+
+</html>
