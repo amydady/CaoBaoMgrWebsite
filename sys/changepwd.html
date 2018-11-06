@@ -97,10 +97,6 @@
     var app = angular.module('myApp', []);
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
-      $scope.supplierInfo = {
-        id: RequestUtil.getQueryParamByName('id')
-      };
-
       //表单验证
       $scope.formValid = function () {
         var validResult = true;
@@ -156,7 +152,7 @@
           return;
         };
 
-        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/changepassword', { id: $scope.id, oldPwd: $scope.oldPwd, pwd: $scope.newPwd }, CommonConfig.httpReqConfig)
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/changepassword', { id: sessionStorage.getItem("currentUserId"), oldPwd: $scope.oldPwd, pwd: $scope.newPwd }, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
             if (result.data.code == "NONE_ERROR") {
               $scope.modalContent = '密码修改成功！';

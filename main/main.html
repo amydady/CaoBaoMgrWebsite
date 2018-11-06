@@ -109,9 +109,7 @@
       if (StringUtil.isEmpty(sessionStorage.getItem("currentUserId"))) {//尚未登录
         window.location = '../main/login.html';
       }
-
-      $scope.currentUserInfo=
-
+      
       //获取进入页面时的MenuID
       $scope.menuId = RequestUtil.getQueryParamByName('menuId');
       $scope.menuName = RequestUtil.getQueryParamByName('menuName');

@@ -18,22 +18,47 @@
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl" class=" bg-light">
-    <div class="container-fluid">
-        <div id='alertInfo'>
+    <div class="container">
+        <div class="row">
 
         </div>
-        <form>
-            <div class="form-group">
-                <input type="text" class="form-control" id="inputId" ng-model='loginInfo.identity' ng-change='onInputIdChanged();'
-                    placeholder="用户名/邮箱/微信号/手机号" autofocus>
+
+        <div class="row align-items-center" style="height:600px">
+            <div class="col-3">
+
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control" id="inputPwd" ng-model='loginInfo.pwd' ng-change='onInputPwdChanged();'
-                    placeholder="密 码">
+            <div class="col-6">
+                <h4>品源社平台后台管理</h4>
+
+                <hr />
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="inputId" ng-model='loginInfo.identity' ng-change='onInputIdChanged();'
+                            placeholder="用户名/邮箱/微信号/手机号" autofocus>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="inputPwd" ng-model='loginInfo.pwd' ng-change='onInputPwdChanged();'
+                            placeholder="密 码">
+                    </div>
+                    <button class="btn btn-primary btn-block" ng-click='signIn()'>登 录</button>
+                </form>
+
+                <br />
+
+                <div id='alertInfo' style="height:100px">
+
+                </div>
+
             </div>
-            <button class="btn btn-lg btn-primary btn-block" ng-click='signIn()'>登 录</button>
-        </form>
+            <div class="col-3">
+
+            </div>
+
+
+        </div>
     </div>
+
+
 
 
     <!-- Optional JavaScript -->
