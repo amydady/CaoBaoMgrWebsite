@@ -27,10 +27,17 @@
         <!-- 操作按钮 -->
         <div class="row">
             <div class="col-sm-2">
+                <select class="form-control" ng-model="search.tuanZhangId" ng-change="onTuanZhangSelectChanged()">
+                    <option value="">根据合作伙伴过滤...</option>
+                    <option ng-repeat="x in tuanListData" value="{{x.id}}">{{x.name}}</option>
+                </select>
+            </div>
+            
+            <div class="col-sm-2">
                 <button class="btn btn-primary" ng-hide="needHidePayBtn" ng-click="onPay()">发放佣金</button>
             </div>
         </div>
-        <br/>
+        <br />
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="daifafang-tab" data-toggle="tab" href="#daifafang" ng-click='ondaifafangTabClick()'
@@ -78,7 +85,7 @@
                                     <td>￥{{x.goodsFee}}</td>
                                     <td>{{x.commissionTypeName}}</td>
                                     <td>￥{{x.calcFee}}</td>
-                                    <td>￥{{x.applyTime}}</td>
+                                    <td>{{x.applyTime}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -161,6 +168,8 @@
                     state: 'applyed'
                 };
 
+                $scope.tuanZhangId = '';
+
                 $scope.ondaifafangTabClick = function () {
                     $scope.search.state = 'applyed';
                     $scope.needHidePayBtn = false;
@@ -188,7 +197,11 @@
                     $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/calc/getList?tuanZhangId=' + $scope.search.tuanZhangId + '&state=' + $scope.search.state)
                         .then(function (result) {  //正确请求成功时处理
                             $scope.listData = result.data.data
-
+                            $scope.tuanListData=[]
+                            for(var i=0;i<$scope.listData.length;i++)
+                            {
+                                $scope.tuanListData.push({id:$scope.listData[i].tuanZhangId,name:$scope.listData[i].tuanZhangName});
+                            }
                             console.log(result);
                         }).catch(function (result) { //捕捉错误处理
                             console.log(result);
@@ -207,6 +220,10 @@
                     document.getElementById('cbxSelectAllOrCancel').checked = false;
                     $scope.selectAll = false;
                 }
+
+                $scope.onTuanZhangSelectChanged=function(){
+                    $scope.getData();
+                };
 
                 //登记支付
                 $scope.onPay = function () {
