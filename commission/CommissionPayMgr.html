@@ -26,16 +26,18 @@
 
         <!-- 操作按钮 -->
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <select class="form-control" ng-model="search.tuanZhangId" ng-change="onTuanZhangSelectChanged()">
-                    <option value="">根据合作伙伴过滤...</option>
+                    <option value="">合作伙伴过滤……</option>
                     <option ng-repeat="x in tuanListData" value="{{x.id}}">{{x.name}}</option>
                 </select>
             </div>
             
-            <div class="col-sm-2">
+            <div class="col-sm-1.5">
                 <button class="btn btn-primary" ng-hide="needHidePayBtn" ng-click="onPay()">发放佣金</button>
             </div>
+            
+            <label class="col-sm-2 col-form-label">费用合计:￥{{totalFee}}</label>
         </div>
         <br />
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -77,7 +79,7 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="x in listData">
-                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox" ng-click="onSelectChanged()"></td>
                                     <td ng-hide={{true}}>{{x.id}}</td>
                                     <td>{{x.tuanZhangName}}</td>
                                     <td>{{x.orderId}}</td>
@@ -209,8 +211,14 @@
                         });
                 };
 
+                $scope.onSelectChanged=function()
+                {
+                    $scope.totalFee=TableUtil.getSumValue('table', 7, 1, $scope.listData.length);
+                };
+
                 $scope.onSelectAllOrCancel = function () {
                     TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.listData.length);
+                    $scope.totalFee=TableUtil.getSumValue('table', 7, 1, $scope.listData.length);
                     $scope.selectAll = !$scope.selectAll;
                 };
 
@@ -219,6 +227,7 @@
                 $scope.resetSelectStatus = function () {
                     document.getElementById('cbxSelectAllOrCancel').checked = false;
                     $scope.selectAll = false;
+                    $scope.totalFee=0;
                 }
 
                 $scope.onTuanZhangSelectChanged=function(){
@@ -263,6 +272,7 @@
 
                 //页面初始化
                 $scope.selectAll = false;
+                $scope.totalFee = 0;
                 $scope.getData();
             });
         </script>

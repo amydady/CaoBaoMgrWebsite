@@ -65,3 +65,25 @@ TableUtil.getSelectedIds = function (tableid, idColIndex, dataStartIndex, dataNu
     return ids;
 };
 
+TableUtil.getSumValue = function (tableid, valueColIndex, dataStartIndex, dataNum) {
+    var table = document.getElementById(tableid);
+    var sumValue = 0;
+
+    if (!validDataRegin(tableid, dataStartIndex, dataNum)) {
+        return sumValue;
+    }
+
+    for (var i = dataStartIndex; i < dataStartIndex + dataNum; i++) {
+        var row = table.rows[i];
+        var inputs = row.getElementsByTagName('input');
+
+        for (var j = 0; j < inputs.length; j++) {
+            if (inputs[j].type == 'checkbox' && inputs[j].checked == true) {
+                sumValue += Number(row.cells[valueColIndex].innerText.replace("￥",""));
+            }
+        }
+    }
+
+    return sumValue;
+};
+
