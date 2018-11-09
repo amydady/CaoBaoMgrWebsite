@@ -30,28 +30,28 @@
       <div class="form-group row">
         <label for="username" class="col-2 col-form-label">账 号</label>
         <div class="col-4">
-          <input type="text" class="form-control" id="username" readonly ng-model="username">
+          <input type="text" class="form-control" id="username" readonly ng-model="detailInfo.username">
         </div>
         <label for="name" class="col-2 col-form-label">名 称</label>
         <div class="col-4">
-          <input type="text" class="form-control" id="name" placeholder="昵 称" ng-model="name">
+          <input type="text" class="form-control" id="name" placeholder="昵 称" ng-model="detailInfo.name">
         </div>
       </div>
       <div class="form-group row">
         <label for="wxCode" class="col-2 col-form-label">微信号</label>
         <div class="col-4">
-          <input type="text" class="form-control" id="wxCode" ng-model="wxCode">
+          <input type="text" class="form-control" id="wxCode" ng-model="detailInfo.wxCode">
         </div>
         <label for="email" class="col-2 col-form-label">邮 件</label>
         <div class="col-4">
-          <input type="email" class="form-control" id="email" ng-model="email">
+          <input type="email" class="form-control" id="email" ng-model="detailInfo.email">
         </div>
       </div>
 
       <div class="form-group row">
         <label for="mobile" class="col-2 col-form-label">手机号</label>
         <div class="col-4">
-          <input type="text" class="form-control" id="mobile" ng-model="mobile">
+          <input type="text" class="form-control" id="mobile" ng-model="detailInfo.mobile">
         </div>
 
       </div>
@@ -102,12 +102,17 @@
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
 
-      if (StringUtil.isEmpty(sessionStorage.getItem("currentUserId"))) {//尚未登录
-        window.location = '../main/login.html';
-      }
+      
+      $scope.getDetailInfo=function(){
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/getbyid?id='+sessionStorage.getItem("currentUserId"))
+          .then(function (result) {  //正确请求成功时处理
+            $scope.detailInfo = result.data.data[0];
 
-      $scope.id = sessionStorage.getItem("currentUserId");
 
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
 
       $scope.cancel = function () {
         window.location = 'UserList.html';
@@ -115,21 +120,9 @@
 
       $scope.saveData = function () {
 
-        if (StringUtil.isEmpty($scope.userName)) {
-          $scope.modalContent = '账号不能为空！';
-          $("#myModal").modal('show');
-          return;
-        }
+        
 
-        var data = {
-          id: $scope.id,
-          name: $scope.name,
-          wxCode: $scope.wxCode,
-          email: $scope.email,
-          mobile: $scope.mobile
-        };
-
-        $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/modify', data, CommonConfig.httpReqConfig)
+        $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/modify', $scope.detailInfo, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
             if (result.data.code == "NONE_ERROR") {
               $scope.modalContent = '修改个人信息成功！';
@@ -157,6 +150,12 @@
       $scope.changepwd = function () {
         window.location = "changepwd.html";
       };
+
+      if (StringUtil.isEmpty(sessionStorage.getItem("currentUserId"))) {//尚未登录
+        window.location = '../main/login.html';
+      }
+
+      $scope.getDetailInfo();
 
     }]);
 
