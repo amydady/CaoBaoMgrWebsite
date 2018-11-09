@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+  <title>添加用户</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+  <div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-2">
+        <h4>添加用户</h4>
+      </div>
+
+      <div class="col-10" id='alertInfo'>
+
+      </div>
+    </div>
+
+    <form>
+      <div class="form-group row">
+        <label for="userName" class="col-sm-1 col-form-label">账 号</label>
+        <div class="col">
+          <input type="text" class="form-control" id="userName" placeholder="用户的账号" ng-model="userName">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-sm-11">
+          <button type="button" class="btn btn-primary" ng-click="saveData()">确 定</button>
+          <button type="button" class="btn btn-secondary" ng-click="cancel()">取 消</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{modalContent}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
+
+  <script>
+    var app = angular.module('myApp', []);
+
+    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+
+      $scope.cancel = function () {
+        window.location = 'UserList.html';
+      };
+
+      $scope.saveData = function () {
+
+        if (StringUtil.isEmpty($scope.userName)) {
+          $scope.modalContent = '账号不能为空！';
+          $("#myModal").modal('show');
+          return;
+        }
+
+        var data = {
+          username: $scope.userName,
+          password: $scope.userName
+        };
+
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'sys/operator/add', data, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            if (result.data.code == "NONE_ERROR") {
+              $scope.modalContent = '添加用户成功（初始密码与账号相同，请通知用户及时修改）。';
+              $("#myModal").modal('show');
+              $scope.userName = '';
+
+              return;
+            }
+
+            if (result.data.code == "DuplicateError") {
+              $scope.modalContent = '添加用户失败，账号已存在！';
+              $("#myModal").modal('show');
+              $scope.userName = '';
+
+              return;
+            }
+
+            $scope.modalContent = '添加用户失败！';
+            $("#myModal").modal('show');
+
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+    }]);
+
+
+  </script>
+</body>
+
+</html>
