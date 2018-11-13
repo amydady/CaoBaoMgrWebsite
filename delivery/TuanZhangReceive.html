@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+    <title>团长收货单</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <div class="container-fluid">
+        <!-- 页面标题 -->
+        <div class="row" style="height:60px">
+            <div class="col">
+                <h4>团长收货单</h4>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="form-group row">
+            <label for="orderDate" class="col-sm-2 col-form-label">日 期</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="orderDate" placeholder="2018-1-1" ng-model="search.orderDate">
+            </div>
+            
+        </div>
+        <div class="form-group row">
+            <label for="tuanZhangName" class="col-sm-2 col-form-label">团长名称</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="tuanZhangName" ng-model="search.tuanZhangName">
+            </div>
+            <label for="tuanZhangMobile" class="col-sm-2 col-form-label">团长手机</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="tuanZhangMobile" ng-model="search.tuanZhangMobile">
+            </div>
+            <div class="col-sm-3">
+                <button class="btn btn-success" ng-click="onQuery()">查 询</button>
+                <button class="btn btn-primary" ng-click="onExport()">导 出</button>
+                <button type="button" class="btn btn-danger" ng-click='onOut()' ng-hide="needHideOut">签 收</button>
+
+            </div>
+        </div>
+        <br />
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+
+            <li class="nav-item">
+                <a class="nav-link active" id="enable-tab" data-toggle="tab" href="#enable" ng-click='onEnableTabClick()'
+                    role="tab" aria-controls="enable" aria-selected="false">待签收</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="disable-tab" data-toggle="tab" href="#disable" ng-click='onDisableTabClick()'
+                    role="tab" aria-controls="disable" aria-selected="false">已签收</a>
+            </li>
+        </ul>
+        <br />
+
+        <!-- 数据区域 -->
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-hover" id="table">
+                    <thead class="bg-info text-white">
+                        <tr>
+                            <th scope="col" ng-hide="needHideOut"><input type="checkbox" id="cbxSelectAllOrCancel"
+                                    ng-click="onSelectAllOrCancel()"></th>
+                            <th scope="col" ng-hide={{true}}>ID</th>
+                            <th scope="col">团长名称</th>
+                            <th scope="col">团长手机</th>
+                            <th scope="col">商品名称</th>
+                            <th scope="col">商品数量</th>
+                            <th scope="col" ng-hide="!needHideOut">签收时间</th>
+                            <th scope="col" ng-hide="!needHideOut">签收人员</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in listData">
+                            <td ng-hide="needHideOut"><input type="checkbox"></td>
+                            <td ng-hide={{true}}>{{x.id}}</td>
+                            <td>{{x.tuanZhangName}}</td>
+                            <td>{{x.tuanZhangMobile}}</td>
+                            <td>{{x.goodsName}}</td>
+                            <td>{{x.goodsNum}}</td>
+                            <td ng-hide="!needHideOut">{{x.receiveTime}}</td>
+                            <td ng-hide="!needHideOut">{{x.receiveOperatorName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{modalContent}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../lib/jquery/jquery.3.2.1.js"></script>
+    <script src="../lib/popper/popper.1.12.9.js"></script>
+    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/angular-1.7.5/angular.min.js"></script>
+    <script src="../common/littleCatCommon.js"></script>
+
+    <script>
+
+        var app = angular.module('myApp', []);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.getData = function () {
+
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/tuanzhangreceive/getList?orderDate=' + $scope.search.orderDate + '&tuanZhangName=' + $scope.search.tuanZhangName + '&tuanZhangMobile=' + $scope.search.tuanZhangMobile + '&state=' + $scope.search.state)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.listData = result.data.data
+
+                        console.log(result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+            $scope.validOrderDate = function () {
+                var orderDate = new Date($scope.search.orderDate);
+
+                if (orderDate == 'Invalid Date') {
+                    $scope.modalContent = '订单日期格式不正确，参考：2018-1-1'
+                    $("#myModal").modal('show');
+                    return false;
+                }
+
+                var yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                if (orderDate > yesterday) {
+                    $scope.modalContent = '订单日期最晚是昨天！'
+                    $("#myModal").modal('show');
+                    return false;
+                }
+
+                return true;
+            };
+
+            $scope.onQuery = function () {
+
+                if (!$scope.validOrderDate()) {
+                    return;
+                }
+
+                $scope.getData();
+            };
+
+            $scope.onExport = function () {
+                if (!$scope.validOrderDate()) {
+                    return;
+                }
+
+                window.location.href = CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/tuanzhangreceive/export?orderDate=' + $scope.search.orderDate;
+            };
+
+            $scope.onSelectAllOrCancel = function () {
+                TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.listData.length);
+                $scope.selectAll = !$scope.selectAll;
+            };
+
+            //重置记录的选择状态
+            $scope.resetSelectStatus = function () {
+                document.getElementById('cbxSelectAllOrCancel').checked = false;
+                $scope.selectAll = false;
+            }
+
+            //出仓
+            $scope.onOut = function () {
+                $scope.resetSelectStatus();
+
+                var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
+
+                if (ids == null || ids.length == 0) {
+                    $scope.modalContent = '请选择待处理的数据！';
+                    return;
+                }
+
+                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/tuanzhangreceive/receive', ids, CommonConfig.httpReqConfig)
+                    .then(function (result) {  //正确请求成功时处理
+                        console.log(result);
+                        $scope.getData();
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                    });
+            };
+
+            $scope.onEnableTabClick = function () {
+                $scope.needHideOut = false;
+                $scope.search.state = "N";
+                $scope.getData();
+            };
+
+            $scope.onDisableTabClick = function () {
+                $scope.needHideOut = true;
+                $scope.search.state = "Y";
+                $scope.getData();
+            };
+
+            //页面初始化
+            $scope.selectAll = false;
+
+            var yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            $scope.search = {
+                orderDate: yesterday.format('yyyy-MM-dd'),
+                tuanZhangName: '',
+                tuanZhangMobile: '',
+                state: 'N'
+            };
+
+            $scope.getData();
+        });
+
+    </script>
+
+</body>
+
+</html>
