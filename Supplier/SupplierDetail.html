@@ -30,8 +30,7 @@
       <div class="form-group row">
         <label for="inputName" class="col-sm-2 col-form-label">名称</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="inputName" placeholder="供应商名称" ng-change='onInputNameChanged();'
-            ng-model="supplierInfo.name">
+          <input type="text" class="form-control" id="inputName" placeholder="供应商名称，必填" ng-model="supplierInfo.name">
         </div>
       </div>
       <div class="form-group row">
@@ -85,11 +84,16 @@
       //表单验证
       $scope.formValid = function () {
         var validResult = true;
+        var firstFlag = true;
 
         var inputName = $('#inputName');
         if (StringUtil.isEmpty($scope.supplierInfo.name)) {
           inputName.addClass('is-invalid');
-          inputName.focus();
+          if (firstFlag) {
+            inputName.focus();
+            firstFlag = false;
+          }
+
           validResult = false;
         }
         else {
@@ -99,11 +103,7 @@
         return validResult;
       };
 
-      $scope.onInputNameChanged = function () {
-        $scope.formValid();
-      };
 
-      
       if (StringUtil.isNotEmpty($scope.supplierInfo.id)) {
         //是否为新增
         $scope.isAdd = false;
@@ -117,9 +117,8 @@
           });
       } else {
         $scope.isAdd = true;
-        $scope.formValid();
       }
-      
+
       $scope.back2List = function () {
         window.location = 'SupplierList.html';
       };

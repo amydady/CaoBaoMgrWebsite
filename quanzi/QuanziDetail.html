@@ -94,6 +94,12 @@
           <input type="text" class="form-control" id="inputApproveTime" readonly ng-model="detailInfo.approveTime">
         </div>
       </div>
+      <div class="form-group row">
+        <label for="inputisDeliverySiteY" class="col-sm-2 col-form-label">作为自提点</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="inputisDeliverySiteY" readonly ng-model="detailInfo.isDeliverySiteY">
+        </div>
+      </div>
 
       <div class="form-group row">
         <div class="col-sm-11">
@@ -132,7 +138,10 @@
 
       $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getById?id=' + $scope.detailInfo.id)
         .then(function (result) {  //正确请求成功时处理
+        console.log('GetDetail:',result);
           $scope.detailInfo = result.data.data[0];
+          $scope.detailInfo.isDeliverySiteY = $scope.detailInfo.isDeliverySite == 'Y' ? '是' : '否';
+
           if ($scope.detailInfo.enable == 'I') {
             $scope.detailInfo.state = '待审核';
             $('#inputApproveRemark').removeAttr('readonly');
@@ -155,25 +164,25 @@
         });
 
       $scope.shenHe = function (enable) {
-        var tuanShenheReqInfo={
-          id:$scope.detailInfo.id,
-          enable:enable,
-          approveRemark:$scope.detailInfo.approveRemark
+        var tuanShenheReqInfo = {
+          id: $scope.detailInfo.id,
+          enable: enable,
+          approveRemark: $scope.detailInfo.approveRemark
         };
 
         $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/shenhe', tuanShenheReqInfo, CommonConfig.httpReqConfig)
-            .then(function (result) {  //正确请求成功时处理
-              if(result.data.code=='NONE_ERROR'){
-                AlertUtil.successWithCloseButton('alertInfo', '审核成功！', AlertUtil.defaultTimeout);
-              }
-              else{
-                AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
-              }
-              
-            }).catch(function (result) { //捕捉错误处理
+          .then(function (result) {  //正确请求成功时处理
+            if (result.data.code == 'NONE_ERROR') {
+              AlertUtil.successWithCloseButton('alertInfo', '审核成功！', AlertUtil.defaultTimeout);
+            }
+            else {
               AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
-              console.log(result);
-            });
+            }
+
+          }).catch(function (result) { //捕捉错误处理
+            AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
+            console.log(result);
+          });
       };
 
       $scope.back2List = function () {

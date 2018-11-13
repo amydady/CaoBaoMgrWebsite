@@ -19,20 +19,18 @@
             <div class="col">
                 <h4>秒杀库存管理</h4>
             </div>
-            <div class="col-10" id='alertInfo'>
-
-            </div>
         </div>
 
         <div class="row">
-            <div class="col-3">
+            <div class="col-2">
                 <h5>商品：{{goodsName}}</h5>
             </div>
             <div class="col-4">
-                <h5>计划开始：{{planStartTime}}</h5>
+                <h5>时间：{{planStartTime}} 至 {{planEndTime}}</h5>
             </div>
+
             <div class="col-4">
-                <h5>计划结束：{{planEndTime}}</h5>
+                <h5>可用库存：{{currentInventory}}</h5>
             </div>
         </div>
         <hr />
@@ -41,7 +39,8 @@
             <div class="form-group row">
                 <label for="inputName" class="col-sm-2 col-form-label">调整数量</label>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" id="inputChangeValue" placeholder="调增填正数，调减填负数" ng-model="detailInfo.changeValue">
+                    <input type="text" class="form-control" id="inputChangeValue" placeholder="调增填正数，调减填负数，最多两位小数"
+                        ng-model="detailInfo.changeValue">
                 </div>
                 <label for="inputRemark" class="col-sm-2 col-form-label">调整描述</label>
                 <div class="col-sm-3">
@@ -50,7 +49,7 @@
 
                 <div class="col-sm-2">
                     <button class="btn btn-success" ng-click="saveData()">确 定</button>
-                    <button class="btn btn-success" ng-click="back2PlanList()">返 回</button>
+                    <button class="btn btn-secondary" ng-click="back2PlanList()">返 回</button>
                 </div>
             </div>
 
@@ -65,18 +64,22 @@
                         <tr>
                             <th scope="col">序 号</th>
                             <th scope="col" ng-hide={{true}}>ID</th>
+                            <th scope="col">调整类型</th>
                             <th scope="col">调整数量</th>
                             <th scope="col">备注信息</th>
                             <th scope="col">调整时间</th>
+                            <th scope="col">调整人员</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="x in listData">
                             <td>{{ $index + 1 }}</td>
                             <td ng-hide={{true}}>{{x.id}}</td>
+                            <td>{{x.changeTypeV}}</td>
                             <th scope="row">{{x.changeValue}}</th>
                             <td>{{x.description}}</td>
                             <td>{{x.createTime}}</td>
+                            <td>{{x.operatorName}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -117,23 +120,9 @@
     <script>
         var app = angular.module('myApp', []);
 
-        // 告警框关闭事件
-        $('#myModal').on('hidden.bs.modal', function (e) {
-            window.location = '../secKill/SecKillPlanList.html';
-        });
+
 
         app.controller('myCtrl', function ($scope, $http) {
-
-            $scope.planId = RequestUtil.getQueryParamByName('planId');
-
-
-            if (StringUtil.isEmpty($scope.planId)) {
-                $scope.modalContent = '请选择秒杀计划进行库存维护！';
-                $('#myModal').modal('show');
-            }
-
-
-
             $scope.getSecKillPlanDetailInfoById = function (id) {
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'seckillplan/getbyid?id=' + id)
                     .then(function (result) {  //正确请求成功时处理
@@ -141,13 +130,14 @@
                         $scope.goodsName = result.data.data[0].goodsName;
                         $scope.planStartTime = result.data.data[0].startTime;
                         $scope.planEndTime = result.data.data[0].endTime;
+                        $scope.currentInventory = result.data.data[0].currentInventory;
 
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
             };
 
-            $scope.getSecKillPlanDetailInfoById($scope.planId);
+
 
             $scope.getData = function (planId) {
 
@@ -155,28 +145,74 @@
                     .then(function (result) {  //正确请求成功时处理
                         $scope.listData = result.data.data
 
-                        console.log(result);
+                        for (var i = 0; i < $scope.listData.length; i++) {
+                            var data = $scope.listData[i];
+                            if (data.changeType == 'rengongzengjia') {
+                                data.changeTypeV = '人工增加';
+                            }
+
+                            if (data.changeType == 'rengongjianshao') {
+                                data.changeTypeV = '人工减少';
+                            }
+                        };
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
-                        alert(result.data.Message);
                     });
+
+                $scope.getSecKillPlanDetailInfoById(planId);
+
             };
 
+            $scope.formValid = function () {
+                var validResult = true;
+                var firstFlag = true;
+
+                var inputChangeValue = $('#inputChangeValue');
+                if (StringUtil.isEmpty($scope.detailInfo.changeValue)) {
+                    inputChangeValue.addClass('is-invalid');
+                    if (firstFlag) {
+                        inputChangeValue.focus();
+                        firstFlag = false;
+                    }
+
+                    validResult = false;
+                }
+                else {
+                    inputChangeValue.removeClass('is-invalid');
+                }
+
+                if (isNaN($scope.detailInfo.changeValue)) {
+                    $scope.modalContent = '调整数量必须为数字！';
+                    $("#myModal").modal('show');
+                    validResult = false;
+                };
+
+                return validResult;
+            };
+
+
             $scope.saveData = function () {
+                if (!$scope.formValid()) {
+                    return;
+                };
+
                 $scope.detailInfo.changeType = $scope.detailInfo.changeValue > 0 ? 'rengongzengjia' : 'rengongjianshao';
-                $scope.detailInfo.operatorId = 'todo';
+                $scope.detailInfo.operatorId = sessionStorage.getItem("currentUserId");
                 $scope.detailInfo.planId = $scope.planId;
 
                 $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/seckill/add', $scope.detailInfo, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
                         console.log('saveData:result', result);
 
-                        var errCode = result.data.code;
-                        if (errCode != 'NONE_ERROR') {
-                            AlertUtil.dangerWithCloseButton('alertInfo', '添加库存变更失败！', AlertUtil.defaultTimeout);
+                        if (result.data.code != 'NONE_ERROR') {
+                            $scope.modalContent = '库存变更失败！';
+                            $("#myModal").modal('show');
                             return;
                         }
-                        AlertUtil.successWithCloseButton('alertInfo', '添加库存变更成功！', AlertUtil.defaultTimeout);
+
+                        $scope.modalContent = '库存变更成功！';
+                        $("#myModal").modal('show');
+
                         $scope.getData($scope.planId);
 
                         $scope.detailInfo.changeValue = '';
@@ -192,9 +228,32 @@
                 window.location = '../secKill/SecKillPlanList.html?goodsId=' + $scope.goodsId;
             };
 
+            $scope.planId = RequestUtil.getQueryParamByName('planId');
 
-            //页面初始化
+
+            if (StringUtil.isEmpty($scope.planId)) {
+                $scope.modalContent = '请选择秒杀计划进行库存维护！';
+
+                // 告警框关闭事件
+                $('#myModal').on('hidden.bs.modal', function (e) {
+                    window.location = '../secKill/SecKillPlanList.html';
+                });
+
+                $('#myModal').modal('show');
+            }
+
+
+
+            $scope.detailInfo = {
+                changeValue: '',
+                description: ''
+            };
+
+            $scope.getSecKillPlanDetailInfoById($scope.planId);
+
             $scope.getData($scope.planId);
+
+
         });
     </script>
 

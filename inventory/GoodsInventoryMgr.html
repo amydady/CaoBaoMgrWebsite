@@ -19,24 +19,36 @@
             <div class="col">
                 <h4>商品库存管理</h4>
             </div>
-            <div class="col-10" id='alertInfo'>
-
-            </div>
         </div>
 
         <form>
             <div class="form-group row">
-                <label for="inputName" class="col-sm-2 col-form-label">调整数量</label>
+                <label for="inputGoodsName" class="col-sm-2 col-form-label">商品名称</label>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" id="inputName" placeholder="调增填正数，调减填负数" ng-model="detailInfo.changeValue">
+                    <input type="text" class="form-control" id="inputGoodsName" readonly ng-model="goodsName">
                 </div>
-                <label for="inputRemark" class="col-sm-2 col-form-label">调整描述</label>
+
+                <label for="inputGoodsName" class="col-sm-2 col-form-label">可用库存</label>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" id="inputRemark" placeholder="库存调整备注信息" ng-model="detailInfo.description">
+                    <input type="text" class="form-control" id="inputGoodsName" readonly ng-model="currentInventory">
+                </div>
+
+            </div>
+
+            <div class="form-group row">
+                <label for="inputChangeValue" class="col-sm-2 col-form-label">调整数量</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="inputChangeValue" placeholder="调增填正数，调减填负数，最多两位小数"
+                        ng-model="detailInfo.changeValue">
+                </div>
+                <label for="inputdescription" class="col-sm-2 col-form-label">调整描述</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="inputdescription" placeholder="库存调整备注信息" ng-model="detailInfo.description">
                 </div>
 
                 <div class="col-sm-2">
                     <button class="btn btn-success" ng-click="saveData()">确 定</button>
+                    <button type="button" class="btn btn-secondary" ng-click="back2List()">返 回</button>
                 </div>
             </div>
 
@@ -55,6 +67,7 @@
                             <th scope="col">调整数量</th>
                             <th scope="col">备注信息</th>
                             <th scope="col">调整时间</th>
+                            <th scope="col">调整人员</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -65,6 +78,7 @@
                             <th scope="row">{{x.changeValue}}</th>
                             <td>{{x.description}}</td>
                             <td>{{x.createTime}}</td>
+                            <td>{{x.operatorName}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -107,18 +121,6 @@
 
         app.controller('myCtrl', function ($scope, $http) {
 
-            $scope.goodsId = RequestUtil.getQueryParamByName('goodsId');
-
-
-            if (StringUtil.isEmpty($scope.goodsId)) {
-                $scope.modalContent = '请选择商品进行库存维护！';
-                $('#myModal').modal('show');
-            }
-
-            // 告警框关闭事件
-            $('#myModal').on('hidden.bs.modal', function (e) {
-                window.location = '../Goods/GoodsList.html';
-            });
 
 
             $scope.getData = function (goodsId) {
@@ -151,32 +153,104 @@
                         console.log(result);
                         alert(result.data.Message);
                     });
+
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getSummayInfoById?id=' + goodsId)
+                    .then(function (result) {  //正确请求成功时处理
+                        $scope.goodsName = result.data.data[0].name;
+                        $scope.currentInventory = result.data.data[0].currentInventory;
+
+                        
+                        console.log(result);
+                    }).catch(function (result) { //捕捉错误处理
+                        console.log(result);
+                        alert(result.data.Message);
+                    });
+            };
+
+            $scope.back2List = function () {
+                window.location = '../Goods/GoodsList.html';
+            };
+
+            $scope.formValid = function () {
+                var validResult = true;
+                var firstFlag = true;
+
+                var inputChangeValue = $('#inputChangeValue');
+                if (StringUtil.isEmpty($scope.detailInfo.changeValue)) {
+                    inputChangeValue.addClass('is-invalid');
+                    if (firstFlag) {
+                        inputChangeValue.focus();
+                        firstFlag = false;
+                    }
+
+                    validResult = false;
+                }
+                else {
+                    inputChangeValue.removeClass('is-invalid');
+                }
+
+                if (isNaN($scope.detailInfo.changeValue)) {
+                    $scope.modalContent = '调整数量必须为数字！';
+                    $("#myModal").modal('show');
+                    validResult = false;
+                };
+
+                return validResult;
             };
 
             $scope.saveData = function () {
+
+                if (!$scope.formValid()) {
+                    return;
+                };
+
                 $scope.detailInfo.changeType = $scope.detailInfo.changeValue > 0 ? 'rengongzengjia' : 'rengongjianshao';
-                $scope.detailInfo.operatorId = 'todo';
+                $scope.detailInfo.operatorId = sessionStorage.getItem("currentUserId");
                 $scope.detailInfo.goodsId = $scope.goodsId;
 
                 $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/goods/add', $scope.detailInfo, CommonConfig.httpReqConfig)
                     .then(function (result) {  //正确请求成功时处理
-                        console.log('saveData:result', result);
-
                         var errCode = result.data.code;
                         if (errCode != 'NONE_ERROR') {
-                            AlertUtil.dangerWithCloseButton('alertInfo', '添加库存变更失败！', AlertUtil.defaultTimeout);
+                            $scope.modalContent = '添加库存变更失败！';
+                            $("#myModal").modal('show');
                             return;
                         }
-                        AlertUtil.successWithCloseButton('alertInfo', '添加库存变更成功！', AlertUtil.defaultTimeout);
-                        $scope.getData($scope.goodsId);
+
+                        $scope.modalContent = '添加库存变更成功！';
+                        $("#myModal").modal('show');
 
                         $scope.detailInfo.changeValue = '';
                         $scope.detailInfo.description = '';
+
+                        $scope.getData($scope.goodsId);
+
+
 
 
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
+            };
+
+            $scope.goodsId = RequestUtil.getQueryParamByName('goodsId');
+
+
+            if (StringUtil.isEmpty($scope.goodsId)) {
+                $scope.modalContent = '请选择商品进行库存维护！';
+                // 告警框关闭事件
+                $('#myModal').on('hidden.bs.modal', function (e) {
+                    window.location = '../Goods/GoodsList.html';
+                });
+
+                $('#myModal').modal('show');
+
+
+            }
+
+            $scope.detailInfo = {
+                changeValue: '',
+                description: ''
             };
 
 
