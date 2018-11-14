@@ -122,6 +122,18 @@
 
         app.controller('myCtrl', function ($scope, $http) {
 
+            $scope.currentUserId = sessionStorage.getItem("currentUserId");
+
+            if (StringUtil.isEmpty($scope.currentUserId)) {
+                window.location = '../main/login.html';
+                return;
+            }
+
+            if ($scope.currentUserId != "admin") {
+                window.location = '../default/NoPermission.html';
+                return;
+            }
+
 
             // 城市维护窗口关闭事件
             $('#myModal').on('hidden.bs.modal', function (e) {
@@ -212,7 +224,7 @@
             };
 
             $scope.onAdd = function () {
-                window.location="NewUser.html";
+                window.location = "NewUser.html";
             };
 
             //密码重置
