@@ -66,7 +66,7 @@
             </div>
             <label for="inputPrice" class="col-sm-2 col-form-label">价格</label>
             <div class="col-sm-4">
-              <input type="text" class="form-control" id="inputPrice" placeholder="价格（单位为厘）" ng-model="goodsDetailInfo.price">
+              <input type="text" class="form-control" id="inputPrice"  ng-model="goodsDetailInfo.price">
             </div>
           </div>
 
@@ -91,7 +91,7 @@
             <div class="form-group row">
               <label for="inputEnable" class="col-sm-2 col-form-label">创建人</label>
               <div class="col-sm-4">
-                <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.createOperatorV">
+                <input type="text" class="form-control" id="inputEnable" readonly="readonly" ng-model="goodsDetailInfo.createOperatorName">
               </div>
 
               <label for="inputCreateTime" class="col-sm-2 col-form-label">创建时间</label>
@@ -184,7 +184,7 @@
                   <td>{{x.sortNum}}</td>
                   <td ng-hide={{true}}>{{x.id}}</td>
                   <td>{{x.title}}</td>
-                  <td><img src="data:image/png;base64,{{x.imgData}}" width="30" height="30" alt="尚未上传产品图片" /></td>
+                  <td><img src="data:image/png;base64,{{x.imgData}}" width="30" height="30" alt="尚未上传产品图片" ng-click="viewImg(x.imgData,x.sortNum)" /></td>
                 </tr>
               </tbody>
             </table>
@@ -216,6 +216,25 @@
     </div>
   </div>
 
+   <!-- Modal -->
+   <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog"  aria-labelledby="exampleModalLabel"
+   aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">图片预览，序号：{{sortNum}}</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+         <img src="data:image/png;base64,{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
+       </div>
+     </div>
+   </div>
+ </div>
+
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="../lib/jquery/jquery.3.2.1.js"></script>
@@ -226,13 +245,14 @@
 
   <script>
     var app = angular.module('myApp', []);
-    CommonConfig.configApp(app);
 
 
-    app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+    app.controller('myCtrl', ['$scope', '$http', function ($scope, $http) {
+      $scope.currentUserId = sessionStorage.getItem("currentUserId");
+
       $scope.goodsDetailInfo = {
-        id: $location.search().id,
-        createOperatorId: 'todo',
+        id: RequestUtil.getQueryParamByName('id'),
+        createOperatorId: $scope.currentUserId,
         supplierId: '-1',
         deliveryAreaId: '-1',
         deliveryFeeRuleId: '-1'
@@ -241,6 +261,13 @@
       $scope.back2List = function () {
         window.location = 'GoodsList.html';
       };
+
+      $scope.viewImg = function (imgdata,sortNum) {
+        $scope.viewImgData = imgdata;
+        $scope.sortNum = sortNum;
+        $('#imgViewModal').modal('show');
+      };
+
 
 
       $scope.getSupplierListData = function () {
@@ -347,7 +374,6 @@
 
           $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/add', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              console.log('saveData:result', result);
 
               var errCode = result.data.code;
               if (errCode != 'NONE_ERROR') {

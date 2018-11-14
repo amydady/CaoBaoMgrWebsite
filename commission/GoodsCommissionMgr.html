@@ -43,7 +43,7 @@
 
                 <label for="inputName" class="col-sm-2 col-form-label">佣金比例</label>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" id="inputRate" placeholder="数字,最多一位小数（如99.9）" ng-model="detailInfo.commissionRate">
+                    <input type="text" class="form-control" id="inputRate" placeholder="数字,最多五位小数" ng-model="detailInfo.commissionRate">
                 </div>
 
                 <div class="col-sm-1">
@@ -60,7 +60,7 @@
             <div class="col" align="right">
                 <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
                 <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
-                <button type="button" class="btn btn-success" ng-click='back2GoodsList()'>返回商品列表</button>
+                <button type="button" class="btn btn-secondary" ng-click='back2GoodsList()'>返回商品列表</button>
 
             </div>
         </div>
