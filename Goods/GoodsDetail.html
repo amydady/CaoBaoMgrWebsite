@@ -134,7 +134,7 @@
         <br />
         <div class="row">
           <div class="col">
-            <img src="data:image/png;base64,{{goodsDetailInfo.mainImgData}}" width="500" height="300" alt="主图预览" />
+            <img src="{{goodsDetailInfo.mainImgData}}" width="500" height="300" alt="主图预览" />
           </div>
         </div>
       </div>
@@ -184,7 +184,7 @@
                   <td>{{x.sortNum}}</td>
                   <td ng-hide={{true}}>{{x.id}}</td>
                   <td>{{x.title}}</td>
-                  <td><img src="data:image/png;base64,{{x.imgData}}" width="30" height="30" alt="尚未上传产品图片" ng-click="viewImg(x.imgData,x.sortNum)" /></td>
+                  <td><img src="{{x.imgData}}" width="30" height="30" alt="尚未上传产品图片" ng-click="viewImg(x.imgData,x.sortNum)" /></td>
                 </tr>
               </tbody>
             </table>
@@ -228,7 +228,7 @@
          </button>
        </div>
        <div class="modal-body">
-         <img src="data:image/png;base64,{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
+         <img src="{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
        </div>
      </div>
    </div>

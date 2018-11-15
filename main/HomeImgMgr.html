@@ -61,7 +61,7 @@
               <td><input type="checkbox"></td>
               <th scope="row"><a href="#" ng-click="getDetail(x.id)">{{x.sortNum}}</a></th>
               <td ng-hide={{true}}>{{x.id}}</td>
-              <td><img src="data:image/png;base64,{{x.imgData}}" width="60" height="60" alt="尚未上传产品图片" ng-click="viewImg(x.imgData,x.sortNum)" /></td>
+              <td><img src="{{x.imgData}}" width="60" height="60" alt="尚未上传产品图片" ng-click="viewImg(x.imgData,x.sortNum)" /></td>
             </tr>
           </tbody>
         </table>
@@ -125,7 +125,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <img src="data:image/png;base64,{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
+          <img src="{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
         </div>
       </div>
     </div>
