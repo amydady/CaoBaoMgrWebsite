@@ -29,8 +29,11 @@
                 <h5>时间：{{planStartTime}} 至 {{planEndTime}}</h5>
             </div>
 
-            <div class="col-4">
-                <h5>可用库存：{{currentInventory}}</h5>
+            <div class="col-3">
+                <h5>秒杀可用库存：{{currentInventory}}</h5>
+            </div>
+            <div class="col-3">
+                <h5>商品可用库存：{{goodsCurrentInventory}}</h5>
             </div>
         </div>
         <hr />
@@ -131,14 +134,13 @@
                         $scope.planStartTime = result.data.data[0].startTime;
                         $scope.planEndTime = result.data.data[0].endTime;
                         $scope.currentInventory = result.data.data[0].currentInventory;
+                        $scope.goodsCurrentInventory = result.data.data[0].goodsCurrentInventory;
 
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
             };
-
-
-
+            
             $scope.getData = function (planId) {
 
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'inventory/seckill/getListByPlanId?planId=' + planId)
@@ -186,6 +188,12 @@
                     $("#myModal").modal('show');
                     validResult = false;
                 };
+
+                if(Number($scope.detailInfo.changeValue) > Number($scope.goodsCurrentInventory)){
+                    $scope.modalContent = '商品可用库存不足！';
+                    $("#myModal").modal('show');
+                    validResult = false;
+                }
 
                 return validResult;
             };
