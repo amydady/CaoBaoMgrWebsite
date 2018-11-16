@@ -99,7 +99,7 @@
     <div class="form-group row">
       <div class="col-sm-11">
         <button class="btn btn-primary" ng-click="saveData()">{{isAdd?'新 增':'修 改'}}</button>
-        <button class="btn btn-primary" ng-click="back2List()">返回列表</button>
+        <button class="btn btn-secondary" ng-click="back2List()">返回列表</button>
 
       </div>
     </div>
@@ -245,7 +245,7 @@
       };
 
       $scope.back2List = function () {
-        window.location = 'SeckillPlanList.html?goodsId=' + $scope.detailInfo.goodsId;
+        window.location = 'SecKillPlanList.html?goodsId=' + $scope.detailInfo.goodsId;
       };
 
       // 提交基本信息
