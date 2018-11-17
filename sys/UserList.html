@@ -19,9 +19,6 @@
             <div class="col">
                 <h4>用户管理</h4>
             </div>
-            <div class="col-10" id='alertInfo'>
-
-            </div>
         </div>
 
         <!-- 操作按钮 -->
@@ -182,7 +179,6 @@
             //置失效
             $scope.onDisable = function () {
                 $scope.resetSelectStatus();
-                AlertUtil.clearAlert('alertInfo');
 
                 var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
 
@@ -204,7 +200,6 @@
             //置生效
             $scope.onEnable = function () {
                 $scope.resetSelectStatus();
-                AlertUtil.clearAlert('alertInfo');
 
                 var ids = TableUtil.getSelectedIds('table', 1, 1, $scope.listData.length);
 

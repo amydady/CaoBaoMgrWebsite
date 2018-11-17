@@ -10,7 +10,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
 
-  <title>QuanziDetail</title>
+  <title>合作伙伴详情</title>
 </head>
 
 <body ng-app="myApp" ng-controller="myCtrl">
@@ -19,10 +19,6 @@
     <div class="row" style="height:60px">
       <div class="col-2">
         <h4>合作伙伴详情</h4>
-      </div>
-
-      <div class="col-10" id='alertInfo'>
-
       </div>
     </div>
 
@@ -64,11 +60,11 @@
 
         <label for="inputState" class="col-sm-2 col-form-label">证件照片（正）</label>
         <div class="col-sm-4">
-          <img src="data:image/png;base64,{{x.idCardImgDataFront}}" height="50" alt="无图片" />
+          <a href="#"><img src="{{x.idCardImgDataFront}}" height="50px" alt="无图片" ng-click="viewImg(x.idCardImgDataFront,'正面')" /></a>
         </div>
         <label for="inputState" class="col-sm-2 col-form-label">证件照片（反）</label>
         <div class="col-sm-4">
-          <img src="data:image/png;base64,{{x.idCardImgDataBack}}" height="50" alt="无图片" />
+            <a href="#"><img src="{{x.idCardImgDataBack}}" height="50px" alt="无图片" ng-click="viewImg(x.idCardImgDataBack,'反面')" /></a>
         </div>
       </div>
 
@@ -112,6 +108,44 @@
     </form>
   </div>
 
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{modalContent}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Modal -->
+   <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+   aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">图片预览【{{viewImgTitle}}】</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+         <img src="{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
+       </div>
+     </div>
+   </div>
+ </div>
+
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -125,43 +159,39 @@
     var app = angular.module('myApp', []);
 
     app.controller('myCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
-      $scope.detailInfo = {
-        id: RequestUtil.getQueryParamByName('id')
+
+
+      $scope.loadTuanInfo = function () {
+
+
+        $scope.needShenHe = false;
+
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getById?id=' + $scope.detailInfo.id)
+          .then(function (result) {  //正确请求成功时处理
+            $scope.detailInfo = result.data.data[0];
+            $scope.detailInfo.isDeliverySiteY = $scope.detailInfo.isDeliverySite == 'Y' ? '是' : '否';
+
+            if ($scope.detailInfo.enable == 'I') {
+              $scope.detailInfo.state = '待审核';
+              $('#inputApproveRemark').removeAttr('readonly');
+              $scope.needShenHe = true;
+            }
+
+            if ($scope.detailInfo.enable == 'Y') {
+              $scope.detailInfo.state = '生效';
+            }
+
+            if ($scope.detailInfo.enable == 'N') {
+              $scope.detailInfo.state = '失效';
+            }
+
+            if ($scope.detailInfo.enable == 'X') {
+              $scope.detailInfo.state = '审核不过';
+            }
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
       };
-
-      if (StringUtil.isEmpty($scope.detailInfo.id)) {
-        return;//TODO
-
-      }
-
-      $scope.needShenHe = false;
-
-      $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getById?id=' + $scope.detailInfo.id)
-        .then(function (result) {  //正确请求成功时处理
-        console.log('GetDetail:',result);
-          $scope.detailInfo = result.data.data[0];
-          $scope.detailInfo.isDeliverySiteY = $scope.detailInfo.isDeliverySite == 'Y' ? '是' : '否';
-
-          if ($scope.detailInfo.enable == 'I') {
-            $scope.detailInfo.state = '待审核';
-            $('#inputApproveRemark').removeAttr('readonly');
-            $scope.needShenHe = true;
-          }
-
-          if ($scope.detailInfo.enable == 'Y') {
-            $scope.detailInfo.state = '生效';
-          }
-
-          if ($scope.detailInfo.enable == 'N') {
-            $scope.detailInfo.state = '失效';
-          }
-
-          if ($scope.detailInfo.enable == 'X') {
-            $scope.detailInfo.state = '审核不过';
-          }
-        }).catch(function (result) { //捕捉错误处理
-          console.log(result);
-        });
 
       $scope.shenHe = function (enable) {
         var tuanShenheReqInfo = {
@@ -173,14 +203,22 @@
         $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/shenhe', tuanShenheReqInfo, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
             if (result.data.code == 'NONE_ERROR') {
-              AlertUtil.successWithCloseButton('alertInfo', '审核成功！', AlertUtil.defaultTimeout);
+              $scope.modalContent = '审核成功！';
+              $("#myModal").modal('show');
+              $scope.loadTuanInfo();
+              return;
             }
             else {
-              AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
+              $scope.modalContent = '审核失败！';
+              $("#myModal").modal('show');
+              return;
             }
 
           }).catch(function (result) { //捕捉错误处理
-            AlertUtil.dangerWithCloseButton('alertInfo', '审核失败！', AlertUtil.defaultTimeout);
+            $scope.modalContent = '审核失败！';
+            $("#myModal").modal('show');
+            return;
+
             console.log(result);
           });
       };
@@ -189,31 +227,31 @@
         window.location = 'QuanziList.html';
       };
 
-      $scope.saveData = function () {
-        if (!$scope.formValid()) {
-          return;
-        }
-
-        if ($scope.isAdd) {//新增
-
-          $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', $scope.supplierInfo, CommonConfig.httpReqConfig)
-            .then(function (result) {  //正确请求成功时处理
-              window.location = 'SupplierList.html'
-            }).catch(function (result) { //捕捉错误处理
-              console.log(result);
-            });
-        }
-        else {//修改
-
-          $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/modify', $scope.supplierInfo, CommonConfig.httpReqConfig)
-            .then(function (result) {  //正确请求成功时处理
-              AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
-            }).catch(function (result) { //捕捉错误处理
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
-              console.log(result);
-            });
-        }
+      $scope.viewImg = function (imgdata,title) {
+        $scope.viewImgData = imgdata;
+        $scope.viewImgTitle = title;
+        $('#imgViewModal').modal('show');
       };
+
+
+      $scope.detailInfo = {
+        id: RequestUtil.getQueryParamByName('id')
+      };
+
+      if (StringUtil.isEmpty($scope.detailInfo.id)) {
+        $scope.modalContent = '请选择某个合作伙伴！';
+        $("#myModal").modal('show');
+
+        // 城市维护窗口关闭事件
+        $('#myModal').on('hidden.bs.modal', function (e) {
+          window.location = 'QuanziList.html';
+        });
+
+        return;
+
+      }
+
+      $scope.loadTuanInfo();
 
     }]);
 
