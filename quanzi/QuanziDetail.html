@@ -56,17 +56,17 @@
         </div>
       </div>
 
-      <div class="form-group row">
+      <!-- <div class="form-group row">
 
         <label for="inputState" class="col-sm-2 col-form-label">证件照片（正）</label>
         <div class="col-sm-4">
-          <a href="#"><img src="{{x.idCardImgDataFront}}" height="50px" alt="无图片" ng-click="viewImg(x.idCardImgDataFront,'正面')" /></a>
+          <a href="#"><img src="{{detailInfo.idCardImgDataFront}}" height="50px" alt="无图片" ng-click="viewImg(detailInfo.idCardImgDataFront,'正面')" /></a>
         </div>
         <label for="inputState" class="col-sm-2 col-form-label">证件照片（反）</label>
         <div class="col-sm-4">
-            <a href="#"><img src="{{x.idCardImgDataBack}}" height="50px" alt="无图片" ng-click="viewImg(x.idCardImgDataBack,'反面')" /></a>
+            <a href="#"><img src="{{detailInfo.idCardImgDataBack}}" height="50px" alt="无图片" ng-click="viewImg(detailInfo.idCardImgDataBack,'反面')" /></a>
         </div>
-      </div>
+      </div> -->
 
       <div class="form-group row">
 
@@ -129,7 +129,7 @@
   </div>
 
    <!-- Modal -->
-   <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+   <!-- <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
    aria-hidden="true">
    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
      <div class="modal-content">
@@ -144,7 +144,7 @@
        </div>
      </div>
    </div>
- </div>
+ </div> -->
 
 
   <!-- Optional JavaScript -->
@@ -162,8 +162,6 @@
 
 
       $scope.loadTuanInfo = function () {
-
-
         $scope.needShenHe = false;
 
         $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'tuan/getById?id=' + $scope.detailInfo.id)
@@ -227,11 +225,11 @@
         window.location = 'QuanziList.html';
       };
 
-      $scope.viewImg = function (imgdata,title) {
-        $scope.viewImgData = imgdata;
-        $scope.viewImgTitle = title;
-        $('#imgViewModal').modal('show');
-      };
+      // $scope.viewImg = function (imgdata,title) {
+      //   $scope.viewImgData = imgdata;
+      //   $scope.viewImgTitle = title;
+      //   $('#imgViewModal').modal('show');
+      // };
 
 
       $scope.detailInfo = {

@@ -132,7 +132,7 @@
 
           $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/add', $scope.supplierInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              window.location = 'SupplierList.html'
+              window.location = 'SupplierList.html';
             }).catch(function (result) { //捕捉错误处理
               console.log(result);
             });
