@@ -130,6 +130,10 @@
         app.controller('myCtrl', function ($scope, $http) {
 
             $scope.getData = function () {
+                if (!$scope.validOrderDate()) {
+                    return;
+                }
+
 
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/tuanzhangreceive/getList?orderDate=' + $scope.search.orderDate + '&tuanZhangName=' + $scope.search.tuanZhangName + '&tuanZhangMobile=' + $scope.search.tuanZhangMobile + '&state=' + $scope.search.state)
                     .then(function (result) {  //正确请求成功时处理
@@ -164,9 +168,7 @@
 
             $scope.onQuery = function () {
 
-                if (!$scope.validOrderDate()) {
-                    return;
-                }
+               
 
                 $scope.getData();
             };
@@ -198,6 +200,7 @@
 
                 if (ids == null || ids.length == 0) {
                     $scope.modalContent = '请选择待处理的数据！';
+                    $("#myModal").modal('show');
                     return;
                 }
 
