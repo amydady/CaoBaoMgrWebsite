@@ -145,7 +145,7 @@
       $scope.detailInfo = {
         goodsId: $location.search().goodsId,
         id: $location.search().id,
-        createOperatorId: '-1',
+        createOperatorId: $scope.currentUserId,
         deliveryAreaId: '-1',
         deliveryFeeRuleId: '-1'
       };

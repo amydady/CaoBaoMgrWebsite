@@ -144,7 +144,8 @@
                 var yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
 
-                if (orderDate > yesterday) {
+
+                if (orderDate.getFullYear()+orderDate.getMonth()+orderDate.getDate() > yesterday.getFullYear()+yesterday.getMonth()+yesterday.getDate()) {
                     $scope.modalContent = '订单日期最晚是昨天！'
                     $("#myModal").modal('show');
                     return false;
