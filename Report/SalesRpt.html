@@ -15,7 +15,7 @@
 
 <body>
   <div class="container-fluid">
-    <div class="card" style="width: 55rem;">
+    <div class="card col-4">
       <div class="card-header">
         商品销售报表
       </div>
@@ -42,9 +42,9 @@
     var barChart = new Chart(popCanvas, {
       type: 'bar',//line, bar, radar, polarArea, pie, doughnut 以及bubble
       data: {
-        labels: ["手霜", "柚子", "猕猴桃"],
+        labels: ["一月", "二月", "三月"],
         datasets: [{
-          label: '销量',
+          label: '猕猴桃',
           data: [111, 222, 333],
           backgroundColor: [
             'rgba(255, 99, 132, 0.6)',
@@ -54,7 +54,7 @@
           ]
         },
         {
-          label: '今日增长',
+          label: '苹果',
           data: [33, 22, 11],
           backgroundColor: [
           'rgba(54, 162, 235, 0.6)',
