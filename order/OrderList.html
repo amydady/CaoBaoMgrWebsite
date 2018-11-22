@@ -22,25 +22,38 @@
             </div>
         </div>
 
+        <!-- 查询条件面板 -->
+        <div id="accordion">
+            <div class="card">
+                <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+                            aria-controls="collapseOne">
+                            查询面板
+                        </button>
+                    </h5>
+                </div>
 
-        <!-- 操作按钮 -->
-        <div class="row">
-            <div class="col-3">
-                <div class="input-group">
-                    <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="名称" ng-keyup="enterEvent($event)"
-                        ng-model="search.name">
-                    <div class="input-group-prepend">
-                        <button type="button" class="btn btn-outline-success" ng-click="onSearch()">查 询</button>
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                    <div class="card-body">
+                        <!-- 操作按钮 -->
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="名称"
+                                        ng-model="search.name">
+                                    <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-success" ng-click="onSearch()">清 空</button>
+                                        <button type="button" class="btn btn-outline-success" ng-click="onSearch()">查 询</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col" align="right">
-                <button type="button" class="btn btn-success" ng-click="add()">添 加</button>
-                <button type="button" class="btn btn-success" ng-click='onEnable()'>生 效</button>
-                <button type="button" class="btn btn-danger" ng-click='onDisable()'>失 效</button>
-            </div>
         </div>
+        
         <hr />
         <!-- 数据区域 -->
         <div class="row">
@@ -48,24 +61,32 @@
                 <table class="table table-striped table-hover" id="tableSupplierList">
                     <thead class="bg-info text-white">
                         <tr>
-                            <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
-                            <th scope="col">序 号</th>
-                            <th scope="col" ng-hide={{true}}>ID</th>
-                            <th scope="col">名 称</th>
-                            <th scope="col">备 注</th>
-                            <th scope="col">创建时间</th>
-                            <th scope="col">是否有效</th>
+                            <th scope="col">订单编号</th>
+                            <th scope="col">用户昵称</th>
+                            <th scope="col">收货人姓名</th>
+                            <th scope="col">收货人手机</th>
+                            <th scope="col">推荐团长</th>
+                            <th scope="col">自提点</th>
+                            <th scope="col">订单费用</th>
+                            <th scope="col">下单时间</th>
+                            <th scope="col">支付时间</th>
+                            <th scope="col">取消时间</th>
+                            <th scope="col">订单状态</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="x in supplierListData">
-                            <td><input type="checkbox"></td>
-                            <td>{{ $index + 1 }}</td>
-                            <td ng-hide={{true}}>{{x.id}}</td>
-                            <th scope="row"><a href="SupplierDetail.html?id={{x.id}}">{{x.name}}</a></th>
-                            <td>{{x.remark}}</td>
+                        <tr ng-repeat="x in listData">
+                            <th scope="row"><a href="OrerDetail.html?id={{x.id}}">{{x.id}}</a></th>
+                            <td>{{x.terminalUserName}}</td>
+                            <td>{{x.contactName}}</td>
+                            <td>{{x.contactMobile}}</td>
+                            <td>{{x.shareTuanZhangName}}</td>
+                            <td>{{x.deliveryTuanZhangName}}</td>
+                            <td>{{x.fee}}</td>
                             <td>{{x.createTime}}</td>
-                            <td>{{x.enable=='Y'?'是':'否'}}</td>
+                            <td>{{x.payTime}}</td>
+                            <td>{{x.cancelTime}}</td>
+                            <td>{{x.state}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -108,116 +129,37 @@
 
         app.controller('myCtrl', function ($scope, $http) {
             $scope.search = {
-                name: ''
+                id: '',
+                shareTuanZhangName: '',
+                deliveryTuanZhangName: '',
+                terminalUserName: '',
+                state: '',
+                curDay: false
             };
 
             $scope.getData = function () {
-                var data = {
-                    "condition": {
-                        "logicType": "and",
-                        "condItems": [
-                            {
-                                "fieldName": "name",
-                                "opType": "like",
-                                "value": $scope.search.name
-                            }
-                        ]
-                    },
-                    "pageParam": {
-                        "pageSize": 40,
-                        "pageIndex": 1
-                    },
-                    "sortFields": "createTime",
-                    "sortType": "asc"
-                };
+                reqParam = 'id=' + $scope.search.id;
+                reqParam += '&shareTuanZhangName=' + $scope.search.shareTuanZhangName;
+                reqParam += '&deliveryTuanZhangName=' + $scope.search.deliveryTuanZhangName;
+                reqParam += '&terminalUserName=' + $scope.search.terminalUserName;
+                reqParam += '&state=' + $scope.search.state;
+                reqParam += '&curDay=' + $scope.search.curDay;
 
-                $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/getList', data, CommonConfig.httpReqConfig)
+                $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'order/getListForWebApp?' + reqParam)
                     .then(function (result) {  //正确请求成功时处理
-                        $scope.supplierListData = result.data.data
+                        $scope.listData = result.data.data
 
                         console.log(result);
                     }).catch(function (result) { //捕捉错误处理
                         console.log(result);
                     });
-            };
-
-            $scope.onSelectAllOrCancel = function () {
-                TableUtil.selectAllOrCncel('tableSupplierList', !$scope.selectAll, 1, $scope.supplierListData.length);
-                $scope.selectAll = !$scope.selectAll;
-            };
-
-            $scope.add = function () {
-                window.location = "SupplierDetail.html";
             };
 
             $scope.onSearch = function () {
                 $scope.getData();
             };
 
-            //重置记录的选择状态
-            $scope.resetSelectStatus = function () {
-                document.getElementById('cbxSelectAllOrCancel').checked = false;
-                $scope.selectAll = false;
-            }
-
-            //置失效
-            $scope.onDisable = function () {
-                $scope.resetSelectStatus();
-
-                var ids = TableUtil.getSelectedIds('tableSupplierList', 2, 1, $scope.supplierListData.length);
-
-                if (ids == null || ids.length == 0) {
-                    $scope.modalContent = '请选择待处理的数据！';
-                    $("#myModal").modal('show');
-                    return;
-                }
-
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/batchdisable', ids, CommonConfig.httpReqConfig)
-                    .then(function (result) {  //正确请求成功时处理
-                        console.log(result);
-                        $scope.getData();
-                    }).catch(function (result) { //捕捉错误处理
-                        console.log(result);
-                    });
-            };
-
-            //置生效
-            $scope.onEnable = function () {
-                $scope.resetSelectStatus();
-
-                var ids = TableUtil.getSelectedIds('tableSupplierList', 2, 1, $scope.supplierListData.length);
-
-                if (ids == null || ids.length == 0) {
-                    $scope.modalContent = '请选择待处理的数据！';
-                    $("#myModal").modal('show');
-                    return;
-                }
-
-                $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'supplier/batchenable', ids, CommonConfig.httpReqConfig)
-                    .then(function (result) {  //正确请求成功时处理
-                        console.log(result);
-                        $scope.getData();
-                    }).catch(function (result) { //捕捉错误处理
-                        console.log(result);
-                    });
-
-
-            };
-
-            $scope.enterEvent = function (e) {
-                var keycode = window.event ? e.keyCode : e.which;
-                if (keycode == 13) {
-                    $scope.onSearch();
-                }
-            };
-
-            //页面初始化
-            $scope.onInit = function () {
-                $scope.selectAll = false;
-                $scope.getData();
-            };
-
-            $scope.onInit();
+            $scope.getData();
         });
     </script>
 </body>
