@@ -36,24 +36,88 @@
 
                 <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                     <div class="card-body">
-                        <!-- 操作按钮 -->
-                        <div class="row">
-                            <div class="col-3">
-                                <div class="input-group">
-                                    <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="名称"
-                                        ng-model="search.name">
-                                    <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-outline-success" ng-click="onSearch()">清 空</button>
-                                        <button type="button" class="btn btn-outline-success" ng-click="onSearch()">查 询</button>
+                        <form>
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">订单编号</div>
+                                        </div>
+                                        <input type="text" class="form-control is-valid" id="inputSearchName" ng-model="search.id">
+
+                                    </div>
+
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">用户昵称</div>
+                                        </div>
+                                        <input type="text" class="form-control  is-valid" id="inlineFormInputGroup"
+                                            ng-model="search.terminalUserName">
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">推荐团长</div>
+                                        </div>
+                                        <input type="text" class="form-control is-valid" id="inputSearchName"
+                                            placeholder="推荐团长名称" ng-model="search.shareTuanZhangName">
+
+                                    </div>
+
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">自提站点</div>
+                                        </div>
+                                        <input type="text" class="form-control  is-valid" id="inlineFormInputGroup"
+                                            placeholder="自提站点名称" ng-model="search.deliveryTuanZhangName">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">订单状态</div>
+                                        </div>
+                                        <select class="form-control is-valid" ng-model="search.state">
+                                            <option value="" ng-selected>全 部</option>
+                                            <option value="daifukuan" ng-selected>待付款</option>
+                                            <option value="daifahuo" ng-selected>待发货</option>
+                                            <option value="daiqianshou" ng-selected>待签收</option>
+                                            <option value="tuikuanzhong" ng-selected>退款中</option>
+                                            <option value="yituikuan" ng-selected>已退款</option>
+                                            <option value="yiquxiao" ng-selected>已取消</option>
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row" form-group>
+                                <div class="col">
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="inlineCheckbox1">只看当天：</label>
+                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" ng-model="search.curDay">
+                                    </div>
+
+                                    <button type="button" class="btn btn-secondary" ng-click="onResetCondition()">重 置</button>
+                                    <button type="button" class="btn btn-success" ng-click="onSearch()">查 询</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <hr />
         <!-- 数据区域 -->
         <div class="row">
@@ -76,7 +140,7 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="x in listData">
-                            <th scope="row"><a href="OrerDetail.html?id={{x.id}}">{{x.id}}</a></th>
+                            <th scope="row"><a href="#">{{x.id}}</a></th>
                             <td>{{x.terminalUserName}}</td>
                             <td>{{x.contactName}}</td>
                             <td>{{x.contactMobile}}</td>
@@ -86,7 +150,7 @@
                             <td>{{x.createTime}}</td>
                             <td>{{x.payTime}}</td>
                             <td>{{x.cancelTime}}</td>
-                            <td>{{x.state}}</td>
+                            <td>{{x.stateV}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -128,14 +192,7 @@
         var app = angular.module('myApp', []);
 
         app.controller('myCtrl', function ($scope, $http) {
-            $scope.search = {
-                id: '',
-                shareTuanZhangName: '',
-                deliveryTuanZhangName: '',
-                terminalUserName: '',
-                state: '',
-                curDay: false
-            };
+
 
             $scope.getData = function () {
                 reqParam = 'id=' + $scope.search.id;
@@ -158,6 +215,19 @@
             $scope.onSearch = function () {
                 $scope.getData();
             };
+
+            $scope.onResetCondition = function () {
+                $scope.search = {
+                    id: '',
+                    shareTuanZhangName: '',
+                    deliveryTuanZhangName: '',
+                    terminalUserName: '',
+                    state: '',
+                    curDay: true
+                };
+            };
+
+            $scope.onResetCondition();
 
             $scope.getData();
         });
