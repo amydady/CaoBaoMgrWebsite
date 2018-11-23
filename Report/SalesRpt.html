@@ -10,21 +10,26 @@
   <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
   <script src="../lib/Chart.bundle.min.js"></script>
 
-  <title>Simple</title>
+  <title>销售报表</title>
 </head>
 
-<body>
+<body ng-app="myApp" ng-controller="myCtrl">
   <div class="container-fluid">
-    <div class="card col-4">
+    <div class="card col-6">
       <div class="card-header">
-        商品销售报表
+        <h3>交易日报</h3>
       </div>
-      <canvas id="popCanvas" class="card-img-top"></canvas>
-      <!-- <div class="card-body">
-        <h5 class="card-title">XXX报表</h5>
-        <p class="card-text">这是一个测试报表.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-      </div> -->
+      <canvas id="OrderSummaryByDayCanvas" class="card-img-top"></canvas>
+      <div class="card-body">
+        <!-- <h5 class="card-title">XXX报表</h5> -->
+        <p class="card-text">基于订单，按天统计总下单量、总成交量、总交易金额。 日期模板：2018-01-01</p>
+        <div class="input-group">
+          <input type="text" class="form-control is-valid" id="inputSearchName" placeholder="指定日期（不指定则默认为当天）" ng-model="search.OrderSummaryByDay.day">
+          <div class="input-group-prepend">
+            <button class="btn btn-secondary" type="button" ng-click="onGetOrderSummaryByDay()">查 询</button>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -35,36 +40,65 @@
   <script src="../lib/jquery/jquery.3.2.1.js"></script>
   <script src="../lib/popper/popper.1.12.9.js"></script>
   <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
 
 
   <script>
-    var popCanvas = document.getElementById("popCanvas").getContext("2d");
-    var barChart = new Chart(popCanvas, {
-      type: 'bar',//line, bar, radar, polarArea, pie, doughnut 以及bubble
-      data: {
-        labels: ["一月", "二月", "三月"],
-        datasets: [{
-          label: '猕猴桃',
-          data: [111, 222, 333],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 99, 132, 0.6)',
-          ]
-        },
-        {
-          label: '苹果',
-          data: [33, 22, 11],
-          backgroundColor: [
-          'rgba(54, 162, 235, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-          ]
-        }]
-      }
+    var app = angular.module('myApp', []);
+
+    app.controller('myCtrl', function ($scope, $http) {
+
+      $scope.getOrderSummaryByDay = function () {
+        var rptDay = $scope.search.OrderSummaryByDay.day;
+        if(StringUtil.isEmpty (rptDay)) {
+          rptDay = "今天";
+        } 
+
+        rptDay = "统计日期：" + rptDay;
+
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'orderrpt/getOrderSummaryByDay?day=' + $scope.search.OrderSummaryByDay.day)
+          .then(function (result) {  //正确请求成功时处理
+            var orderSummaryData = result.data.data[0]
+
+            var canvas = document.getElementById("OrderSummaryByDayCanvas").getContext("2d");
+            var chart = new Chart(canvas, {
+              type: 'bar',//line, bar, radar, polarArea, pie, doughnut 以及bubble
+              data: {
+                labels: ["下单量", "成交量", "成交额"],
+                datasets: [{
+                  label: rptDay,
+                  data: [orderSummaryData.total_count, orderSummaryData.payed_count, orderSummaryData.payed_fee_sum],
+                  backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                  ]
+                }]
+              }
+            });
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.onGetOrderSummaryByDay = function () {
+        $scope.getOrderSummaryByDay();
+      };
+
+      $scope.search = {
+        OrderSummaryByDay: {
+          day: ''
+        }
+      };
+
+      $scope.getOrderSummaryByDay();
+
+
     });
+
+
 
   </script>
 
