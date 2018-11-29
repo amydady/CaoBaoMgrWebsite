@@ -99,14 +99,25 @@
                                     </div>
 
                                 </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">下单日期</div>
+                                        </div>
+                                        <input type="text" class="form-control  is-valid" id="inlineFormInputGroup"
+                                        placeholder="订单创建日期" ng-model="search.createDate">
+
+                                    </div>
+
+                                </div>
 
                             </div>
                             <div class="row" form-group>
                                 <div class="col">
-                                    <div class="form-check form-check-inline">
+                                    <!-- <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="inlineCheckbox1">只看当天：</label>
                                         <input class="form-check-input" type="checkbox" id="inlineCheckbox1" ng-model="search.curDay">
-                                    </div>
+                                    </div> -->
 
                                     <button type="button" class="btn btn-secondary" ng-click="onResetCondition()">重 置</button>
                                     <button type="button" class="btn btn-success" ng-click="onSearch()">查 询</button>
@@ -200,7 +211,7 @@
                 reqParam += '&deliveryTuanZhangName=' + $scope.search.deliveryTuanZhangName;
                 reqParam += '&terminalUserName=' + $scope.search.terminalUserName;
                 reqParam += '&state=' + $scope.search.state;
-                reqParam += '&curDay=' + $scope.search.curDay;
+                reqParam += '&createDate=' + $scope.search.createDate;
 
                 $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'order/getListForWebApp?' + reqParam)
                     .then(function (result) {  //正确请求成功时处理
@@ -223,7 +234,7 @@
                     deliveryTuanZhangName: '',
                     terminalUserName: '',
                     state: '',
-                    curDay: true
+                    createDate: DateTimeUtil.getCurrentDate()
                 };
             };
 

@@ -19,3 +19,7 @@ Date.prototype.format = function (format) {
     return format;
 };
 
+
+DateTimeUtil.getCurrentDate = function(){
+    return new Date().format('yyyy-MM-dd');
+};
