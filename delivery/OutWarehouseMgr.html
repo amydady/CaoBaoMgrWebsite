@@ -145,7 +145,7 @@
                 yesterday.setDate(yesterday.getDate() - 1);
 
 
-                if (orderDate.getFullYear()+orderDate.getMonth()+orderDate.getDate() > yesterday.getFullYear()+yesterday.getMonth()+yesterday.getDate()) {
+                if (orderDate.getFullYear() + orderDate.getMonth() + orderDate.getDate() > yesterday.getFullYear() + yesterday.getMonth() + yesterday.getDate()) {
                     $scope.modalContent = '订单日期最晚是昨天！'
                     $("#myModal").modal('show');
                     return false;
@@ -155,9 +155,6 @@
             };
 
             $scope.onQuery = function () {
-
-                
-
                 $scope.getData();
             };
 
@@ -165,7 +162,7 @@
                 if (!$scope.validOrderDate()) {
                     return;
                 }
-                
+
                 window.location.href = CommonConfig.RestBaseUrl.CaoBaoService + 'delivery/outwarehouse/export?orderDate=' + $scope.search.orderDate;
             };
 
@@ -212,6 +209,12 @@
                 $scope.search.state = "Y";
                 $scope.getData();
             };
+
+            $(document).keyup(function (event) {
+                if (event.keyCode == 13) {
+                    $scope.onQuery();
+                }
+            });
 
             //页面初始化
             $scope.selectAll = false;

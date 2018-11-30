@@ -184,9 +184,6 @@
             };
 
             $scope.onQuery = function () {
-
-                
-
                 $scope.getData();
             };
 
@@ -241,6 +238,12 @@
                 $scope.search.state = "Y";
                 $scope.getData();
             };
+
+            $(document).keyup(function (event) {
+                if (event.keyCode == 13) {
+                    $scope.onQuery();
+                }
+            });
 
             //页面初始化
             $scope.selectAll = false;

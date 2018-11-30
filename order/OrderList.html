@@ -240,6 +240,12 @@
 
             $scope.onResetCondition();
 
+             $(document).keyup(function (event) {
+                if (event.keyCode == 13) {
+                    $scope.onSearch();
+                }
+            });
+
             $scope.getData();
         });
     </script>

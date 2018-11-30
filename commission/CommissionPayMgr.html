@@ -32,11 +32,11 @@
                     <option ng-repeat="x in tuanListData" value="{{x.id}}">{{x.name}}</option>
                 </select>
             </div>
-            
+
             <div class="col-sm-1.5">
                 <button class="btn btn-primary" ng-hide="needHidePayBtn" ng-click="onPay()">发放佣金</button>
             </div>
-            
+
             <label class="col-sm-2 col-form-label">费用合计:￥{{totalFee}}</label>
         </div>
         <br />
@@ -175,6 +175,7 @@
                 $scope.ondaifafangTabClick = function () {
                     $scope.search.state = 'applyed';
                     $scope.needHidePayBtn = false;
+                    $scope.search.tuanZhangId = ''
                     $scope.getData();
                 };
 
@@ -183,6 +184,7 @@
                     $scope.needHidePayBtn = true;
                     $scope.needHidePayTime = false;
                     $scope.needHideDisableTime = true;
+                    $scope.search.tuanZhangId = ''
                     $scope.getData();
                 };
 
@@ -191,6 +193,7 @@
                     $scope.needHidePayBtn = true;
                     $scope.needHidePayTime = true;
                     $scope.needHideDisableTime = false;
+                    $scope.search.tuanZhangId = ''
                     $scope.getData();
                 };
 
@@ -199,11 +202,16 @@
                     $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/calc/getList?tuanZhangId=' + $scope.search.tuanZhangId + '&state=' + $scope.search.state)
                         .then(function (result) {  //正确请求成功时处理
                             $scope.listData = result.data.data
-                            $scope.tuanListData=[]
-                            for(var i=0;i<$scope.listData.length;i++)
-                            {
-                                $scope.tuanListData.push({id:$scope.listData[i].tuanZhangId,name:$scope.listData[i].tuanZhangName});
+                            $scope.tuanListData = []
+                            let ids = []//用于排重的临时数组
+                            for (var i = 0; i < $scope.listData.length; i++) {
+                                if (ids.indexOf($scope.listData[i].tuanZhangId) == -1) {
+                                    ids.push($scope.listData[i].tuanZhangId)
+                                    $scope.tuanListData.push({ id: $scope.listData[i].tuanZhangId, name: $scope.listData[i].tuanZhangName });
+                                }
+
                             }
+                            
                             console.log(result);
                         }).catch(function (result) { //捕捉错误处理
                             console.log(result);
@@ -211,14 +219,13 @@
                         });
                 };
 
-                $scope.onSelectChanged=function()
-                {
-                    $scope.totalFee=TableUtil.getSumValue('table', 7, 1, $scope.listData.length);
+                $scope.onSelectChanged = function () {
+                    $scope.totalFee = TableUtil.getSumValue('table', 7, 1, $scope.listData.length);
                 };
 
                 $scope.onSelectAllOrCancel = function () {
                     TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.listData.length);
-                    $scope.totalFee=TableUtil.getSumValue('table', 7, 1, $scope.listData.length);
+                    $scope.totalFee = TableUtil.getSumValue('table', 7, 1, $scope.listData.length);
                     $scope.selectAll = !$scope.selectAll;
                 };
 
@@ -227,10 +234,10 @@
                 $scope.resetSelectStatus = function () {
                     document.getElementById('cbxSelectAllOrCancel').checked = false;
                     $scope.selectAll = false;
-                    $scope.totalFee=0;
+                    $scope.totalFee = 0;
                 }
 
-                $scope.onTuanZhangSelectChanged=function(){
+                $scope.onTuanZhangSelectChanged = function () {
                     $scope.getData();
                 };
 
