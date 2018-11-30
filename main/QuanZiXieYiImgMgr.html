@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+
+  <title>合作协议维护</title>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+
+  <div class="container-fluid">
+
+    <!-- 页面标题 -->
+    <div class="row" style="height:60px">
+      <div class="col-md-3">
+        <h4>合作协议维护</h4>
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="sortNum" class="col-sm-1 col-form-label">展示序号</label>
+      <div class="col-sm-1">
+        <input type="text" class="form-control" id="sortNum" placeholder="整数" ng-model="detailInfo.sortNum">
+      </div>
+
+      <label for="inputCreateTime" class="col-sm-1 col-form-label">图片</label>
+      <div class="col-sm-3">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="homeImg" name='homeImg'/>
+          <label class="custom-file-label" for="homeImg">请选择图片……</label>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-primary" ng-click="save()">{{detailInfo.id==''?'添 加':'修 改'}}</button>
+        <button class="btn btn-secondary" ng-click="cancel()">取 消</button>
+      </div>
+    </div>
+
+    <hr />
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-success" ng-click="delete()">删 除</button>
+        <table class="table table-striped table-hover" id="table">
+          <thead class="bg-primary text-white">
+            <tr>
+              <th scope="col"><input type="checkbox" id="cbxSelectAllOrCancel" ng-click="onSelectAllOrCancel()"></th>
+              <th scope="col">序 号</th>
+              <th scope="col" ng-hide={{true}}>ID</th>
+              <th scope="col">预 览</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="x in homeImgs">
+              <td><input type="checkbox"></td>
+              <th scope="row"><a href="#" ng-click="getDetail(x.id)">{{x.sortNum}}</a></th>
+              <td ng-hide={{true}}>{{x.id}}</td>
+              <td><img src="{{x.imgData}}" width="60" height="60" alt="尚未上传产品图片" ng-click="viewImg(x.imgData,x.sortNum)" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">友情提示</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{modalContent}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="confirmModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">操作确认</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{modalContent}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="confirmOk()">确 定</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="confirmCancel()">取 消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">图片预览，序号：{{sortNum}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <img src="{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="../lib/jquery/jquery.3.2.1.js"></script>
+  <script src="../lib/popper/popper.1.12.9.js"></script>
+  <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../lib/angular-1.7.5/angular.min.js"></script>
+  <script src="../common/littleCatCommon.js"></script>
+
+  <script>
+    var app = angular.module('myApp', []);
+
+
+    app.controller('myCtrl', ['$scope', '$http', function ($scope, $http) {
+      $scope.detailInfo = {
+        id: '',
+        sortNum:0
+      };
+      
+      $scope.confirmOk = function () {
+        $scope.actionF();
+      };
+
+      $scope.confirmCancel = function () {
+        return;
+      };
+
+      $scope.viewImg = function (imgdata,sortNum) {
+        $scope.viewImgData = imgdata;
+        $scope.sortNum = sortNum;
+        $('#imgViewModal').modal('show');
+      };
+
+
+      //获取图片列表信息
+      $scope.getHomeImgs = function (goodsId) {
+        var queryData = {
+
+          "sortFields": "sortNum",
+          "sortType": "asc"
+        };
+
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'basicinfo/getQuanZiXieYiImgsList', queryData, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            console.log('getGoodsDetailImg:result', result);
+
+            $scope.homeImgs = result.data.data;
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.getDetail = function (id) {
+        $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'basicinfo/getQuanZiXieYiImgsByid?id=' + id)
+          .then(function (result) {  //正确请求成功时处理
+            $scope.detailInfo = result.data.data[0];
+
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.cancel = function(){
+        $scope.resetDetailInfo();
+        var homeImgFile = document.getElementById('homeImg');
+        homeImgFile.outerHTML=homeImgFile.outerHTML;
+      };
+
+      //保存图片信息
+      $scope.save = function () {
+        var fd = new FormData();
+        var file = document.getElementById('homeImg').files[0];
+        fd.append('homeImg', file);
+
+        if (StringUtil.isEmpty($scope.detailInfo.id) && file == undefined) {
+          $scope.modalContent = '请选择文件！';
+          $('#myModal').modal('show');
+          return;
+        }
+
+        if(isNaN($scope.detailInfo.sortNum)){
+          $scope.modalContent = '展示序号必须为整数！';
+          $('#myModal').modal('show');
+          return;
+        }
+
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'basicinfo/uploadQuanZiXieYi?id=' + $scope.detailInfo.id + '&sortNum=' + $scope.detailInfo.sortNum, fd, CommonConfig.fileUploadReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            console.log('save:result', result);
+
+            if (result.data.code == 'NONE_ERROR') {
+              $scope.modalContent = '保存成功！';
+              $('#myModal').modal('show');
+
+              $scope.getHomeImgs($scope.detailInfo.id);
+
+              $scope.resetDetailInfo();
+            }
+            else {
+              $scope.modalContent = '保存失败！';
+              $('#myModal').modal('show');
+            }
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.resetDetailInfo = function () {
+        $scope.detailInfo = {
+          id: '',
+          sortNum: 0
+        };
+      };
+
+      //删除明细图片
+      $scope.delete = function () {
+        var ids = TableUtil.getSelectedIds('table', 2, 1, $scope.homeImgs.length);
+
+        if (ids == null || ids.length == 0) {
+          $scope.modalContent = '请选择待处理的数据！';
+          $('#myModal').modal('show');
+          return;
+        }
+
+        $scope.ids = ids;
+
+
+        $scope.actionF = $scope.doDelete;
+        $scope.modalContent = '确定要删除选择的图片吗？';
+        $('#confirmModal').modal('show');
+
+      };
+
+      $scope.doDelete = function () {
+        $scope.resetSelectStatus();
+
+
+        $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'basicinfo/deleteQuanZiXieYiImgs', $scope.ids, CommonConfig.httpReqConfig)
+          .then(function (result) {  //正确请求成功时处理
+            console.log(result);
+            $scope.getHomeImgs();
+          }).catch(function (result) { //捕捉错误处理
+            console.log(result);
+          });
+      };
+
+      $scope.onSelectAllOrCancel = function () {
+        TableUtil.selectAllOrCncel('table', !$scope.selectAll, 1, $scope.homeImgs.length);
+        $scope.selectAll = !$scope.selectAll;
+      };
+
+      //重置记录的选择状态
+      $scope.resetSelectStatus = function () {
+        document.getElementById('cbxSelectAllOrCancel').checked = false;
+        $scope.selectAll = false;
+      };
+
+      $scope.getHomeImgs();
+      
+
+    }]);
+  </script>
+
+</body>
+
+</html>
