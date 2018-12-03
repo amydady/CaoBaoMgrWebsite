@@ -22,10 +22,6 @@
       <div class="col-md-3">
         <h4>商品详情</h4>
       </div>
-
-      <div class="col-md-9" id='alertInfo'>
-
-      </div>
     </div>
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -66,7 +62,7 @@
             </div>
             <label for="inputPrice" class="col-sm-2 col-form-label">价格</label>
             <div class="col-sm-4">
-              <input type="text" class="form-control" id="inputPrice"  ng-model="goodsDetailInfo.price">
+              <input type="text" class="form-control" id="inputPrice" ng-model="goodsDetailInfo.price">
             </div>
           </div>
 
@@ -216,23 +212,23 @@
     </div>
   </div>
 
-   <!-- Modal -->
-   <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog"  aria-labelledby="exampleModalLabel"
-   aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title" id="exampleModalLabel">图片预览，序号：{{sortNum}}</h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span aria-hidden="true">&times;</span>
-         </button>
-       </div>
-       <div class="modal-body">
-         <img src="{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
-       </div>
-     </div>
-   </div>
- </div>
+  <!-- Modal -->
+  <div class="modal fade bd-example-modal-lg" id="imgViewModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">图片预览，序号：{{sortNum}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <img src="{{viewImgData}}" width="100%" height="100%" alt="无法显示" />
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Optional JavaScript -->
@@ -262,7 +258,7 @@
         window.location = 'GoodsList.html';
       };
 
-      $scope.viewImg = function (imgdata,sortNum) {
+      $scope.viewImg = function (imgdata, sortNum) {
         $scope.viewImgData = imgdata;
         $scope.sortNum = sortNum;
         $('#imgViewModal').modal('show');
@@ -376,26 +372,37 @@
             .then(function (result) {  //正确请求成功时处理
 
               var errCode = result.data.code;
-              if (errCode != 'NONE_ERROR') {
-                AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+              if (result.data.code != 'NONE_ERROR') {
+                $scope.modalContent = '修改失败！';
+                $('#myModal').modal('show');
+                console.log('saveData:result', result);
                 return;
               }
 
               window.location = 'GoodsDetail.html?id=' + result.data.data[0];
 
             }).catch(function (result) { //捕捉错误处理
-              console.log(result);
+              $scope.modalContent = '添加失败！';
+              $('#myModal').modal('show');
+              console.log('saveData:result', result);
             });
         }
         else {//修改
           $http.put(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/modify', $scope.goodsDetailInfo, CommonConfig.httpReqConfig)
             .then(function (result) {  //正确请求成功时处理
-              AlertUtil.successWithCloseButton('alertInfo', '修改成功！', AlertUtil.defaultTimeout);
-
-              console.log(result);
+              if (result.data.code != 'NONE_ERROR') {
+                $scope.modalContent = '修改失败！';
+                $('#myModal').modal('show');
+                console.log('saveData:result', result);
+              }
+              else {
+                $scope.modalContent = '修改成功！';
+                $('#myModal').modal('show');
+              }
             }).catch(function (result) { //捕捉错误处理
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
-              console.log(result);
+              $scope.modalContent = '修改失败！';
+              $('#myModal').modal('show');
+              console.log('saveData:result', result);
             });
         }
       };
@@ -408,17 +415,21 @@
 
         $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/uploadmainimg/' + $scope.goodsDetailInfo.id, fd, CommonConfig.fileUploadReqConfig)
           .then(function (result) {  //正确请求成功时处理
-            console.log('saveMainImg:result', result);
 
             if (result.data.code != 'NONE_ERROR') {
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+              $scope.modalContent = '修改失败！';
+              $('#myModal').modal('show');
+              console.log('saveMainImg:result', result);
               return;
             }
 
             $scope.getGoodsDetailInfoById($scope.goodsDetailInfo.id);
 
           }).catch(function (result) { //捕捉错误处理
-            console.log(result);
+            $scope.modalContent = '修改失败！';
+            $('#myModal').modal('show');
+            console.log('saveMainImg:result', result);
+            return;
           });
       };
 
@@ -441,11 +452,11 @@
 
         $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/getDetailImgList', queryData, CommonConfig.httpReqConfig)
           .then(function (result) {  //正确请求成功时处理
-            console.log('getGoodsDetailImg:result', result);
 
-            var errCode = result.data.code;
-            if (errCode != 'NONE_ERROR') {
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+            if (result.data.code != 'NONE_ERROR') {
+              $scope.modalContent = '获取商品明细图片失败！';
+              $('#myModal').modal('show');
+              console.log('getGoodsDetailImg:result', result);
               return;
             }
 
@@ -462,12 +473,12 @@
         var file = document.getElementById('goodsDetailImg').files[0];
         fd.append('goodsDetailImg', file);
 
-        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '/' + $scope.detailImage.title + '/' + $scope.detailImage.sortNum, fd, CommonConfig.fileUploadReqConfig)
+        $http.post(CommonConfig.RestBaseUrl.CaoBaoService + 'goods/detailimgs/add/' + $scope.goodsDetailInfo.id + '?title=' + $scope.detailImage.title + '&sortNum=' + $scope.detailImage.sortNum, fd, CommonConfig.fileUploadReqConfig)
           .then(function (result) {  //正确请求成功时处理
-            console.log('saveGoodsDetailImg:result', result);
-
             if (result.data.code != 'NONE_ERROR') {
-              AlertUtil.dangerWithCloseButton('alertInfo', '修改失败！', AlertUtil.defaultTimeout);
+              $scope.modalContent = '添加商品明细图片失败！';
+              $('#myModal').modal('show');
+              console.log('saveGoodsDetailImg:result', result);
               return;
             }
 
@@ -481,7 +492,6 @@
       //删除明细图片
       $scope.deleteGoodsDetailImg = function () {
         $scope.resetSelectStatus();
-        AlertUtil.clearAlert('alertInfo');
 
         var ids = TableUtil.getSelectedIds('tableDetailImgs', 2, 1, $scope.goodsDetailInfo.detailImgs.length);
 
