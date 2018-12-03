@@ -362,6 +362,11 @@
         } else {
           $scope.isAdd = true;
         }
+
+        $scope.detailImage = {
+          title: '',
+          sortNum: 0
+        };
       };
 
       // 提交基本信息
@@ -467,8 +472,25 @@
           });
       };
 
+      $scope.deailImgformValid = function () {
+        var validResult = true;
+
+        if (StringUtil.isNotEmpty($scope.detailImage.sortNum) && isNaN($scope.detailImage.sortNum)) {
+          $scope.modalContent = '编号必须为整型数字！';
+          $("#myModal").modal('show');
+          validResult = false;
+        };
+
+        return validResult;
+      };
+
+
       //添加一条明细图片
       $scope.saveGoodsDetailImg = function () {
+        if (!$scope.deailImgformValid()) {
+          return;
+        }
+
         var fd = new FormData();
         var file = document.getElementById('goodsDetailImg').files[0];
         fd.append('goodsDetailImg', file);
