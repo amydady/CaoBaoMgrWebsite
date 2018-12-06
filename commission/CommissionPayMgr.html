@@ -75,6 +75,7 @@
                                     <th scope="col">佣金类别</th>
                                     <th scope="col">佣金费用</th>
                                     <th scope="col">申请时间</th>
+                                    <th scope="col">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,6 +89,9 @@
                                     <td>{{x.commissionTypeName}}</td>
                                     <td>￥{{x.calcFee}}</td>
                                     <td>{{x.applyTime}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-secondary btn-sm" ng-click="getApplyInfoByApplyTime(x.tuanZhangId,x.applyTime)">查看申请信息</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -110,6 +114,7 @@
                                     <th scope="col">佣金费用</th>
                                     <th scope="col" ng-hide="needHidePayTime">发放时间</th>
                                     <th scope="col" ng-hide="needHideDisableTime">失效时间</th>
+                                    <th scope="col">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -122,6 +127,9 @@
                                     <td>￥{{x.calcFee}}</td>
                                     <td ng-hide="needHidePayTime">{{x.payTime}}</td>
                                     <td ng-hide="needHideDisableTime">{{x.disableTime}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-secondary btn-sm" ng-click="getApplyInfoByApplyTime(x.tuanZhangId,x.applyTime)">查看申请信息</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -149,6 +157,60 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">确 定</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- applyInfoModal -->
+        <div id='applyInfoModal' class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">佣金申请信息</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group row">
+                                <label for="inputName" class="col-sm-2 col-form-label">开户人姓名</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="inputName" readonly ng-model="applyInfo.bankHolderName">
+                                </div>
+
+                                <label for="inputName" class="col-sm-2 col-form-label">支付宝姓名</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="inputFee" readonly ng-model="applyInfo.zfbName">
+                                </div>
+
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputName" class="col-sm-2 col-form-label">开户行名称</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="inputFee" readonly ng-model="applyInfo.bankName">
+                                </div>
+
+                                <label for="inputName" class="col-sm-2 col-form-label">支付宝账号</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="inputFee" readonly ng-model="applyInfo.zfbAccount">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputName" class="col-sm-2 col-form-label">银行账号</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="inputBeginValue" readonly ng-model="applyInfo.bankAccount">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关 闭</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -211,7 +273,7 @@
                                 }
 
                             }
-                            
+
                             console.log(result);
                         }).catch(function (result) { //捕捉错误处理
                             console.log(result);
@@ -277,9 +339,30 @@
                         });
                 };
 
+                $scope.getApplyInfoByApplyTime = function (tuanZhangId, applyTime) {
+                    $http.get(CommonConfig.RestBaseUrl.CaoBaoService + 'commission/calc/getApplyInfoByApplyTime?tuanZhangId=' + tuanZhangId + '&applyTime=' + applyTime)
+                        .then(function (result) {  //正确请求成功时处理
+                            if (result.data.data.length > 0) {
+                                $scope.applyInfo = result.data.data[0]
+                                $("#applyInfoModal").modal('show');
+                            }
+                            else {
+                                $scope.modalContent = '获取申请信息失败！';
+                                $("#myModal").modal('show');
+
+                                console.log(result);
+                            }
+                            
+                        }).catch(function (result) { //捕捉错误处理
+                            console.log(result);
+                        });
+                };
+
                 //页面初始化
                 $scope.selectAll = false;
                 $scope.totalFee = 0;
+
+                $scope.applyInfo = {};
                 $scope.getData();
             });
         </script>
